@@ -1,0 +1,28 @@
+﻿<div class="folder-item" onClick={this.props.onClick}>
+	<div class="folder-item-image">
+		<img style=" width: 50%; justify-content:center" src=@GetImage() alt="Folder Icon" />
+	</div>
+	<p class="folder-item-text" style=" flex: 4 "> @Name </p>
+	<p class="folder-item-text" style=" flex: 1 "> @SizeBytes </p>
+	<div class="folder-item-image">
+		<img style=" width: 50%; color: blue; stroke: blue; fill: blue; visibility: @IsFile" src="download.svg" alt="Download Icon" />
+	</div>
+</div>
+
+
+@code {
+	private bool IsFile = false;
+
+	private string Name = "FileName";
+
+	private int SizeBytes = 4096;
+
+	private string GetImage()
+	{
+		if (IsFile)
+			return "document.svg";
+		else
+			return "folder.svg";
+	}
+
+}
