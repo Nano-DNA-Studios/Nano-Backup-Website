@@ -33,9 +33,11 @@
 .header-text {
     flex: 1;
     display: flex;
-    text-align: left;
+    align-items: center;
     justify-content: left;
     font-size: 28px;
+    height: 100%;
+    margin:0;
 }
 
 .file-view {
