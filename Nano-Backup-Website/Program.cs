@@ -1,4 +1,3 @@
-
 using NanoBackupWebsite.Components;
 
 namespace NanoBackupWebsite
@@ -9,13 +8,15 @@ namespace NanoBackupWebsite
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            //Allow the Webiste to be accessed from http://localhost:5000
+            builder.WebHost.UseUrls("http://*:5000");
+
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
             builder.Services.AddScoped<FileNavigatorService>();
             builder.Services.AddControllers();
-
 
             var app = builder.Build();
 
