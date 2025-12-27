@@ -1,6 +1,7 @@
-using Nano_Backup_Website.Components;
 
-namespace Nano_Backup_Website
+using NanoBackupWebsite.Components;
+
+namespace NanoBackupWebsite
 {
     public class Program
     {
@@ -11,6 +12,8 @@ namespace Nano_Backup_Website
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            builder.Services.AddScoped<FileNavigatorService>();
 
             var app = builder.Build();
 
