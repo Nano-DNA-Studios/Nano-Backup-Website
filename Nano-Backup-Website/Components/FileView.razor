@@ -1,0 +1,44 @@
+﻿<div>
+	<!-- Add Navigation Bar Here-->
+	<div class="navigation-bar">
+		<img src="backbtn.svg" class="btn" alt="Back" />
+		<img src="home.svg" class="btn" alt="Home" />
+		@Path
+	</div>
+	<div class="file-view">
+		<div class="header">
+			<div class="header-img">
+				<img style="width:50%" src="document.svg" alt="Folder Icon" />
+			</div>
+			<p class="header-text" style="flex:4">
+				Name
+			</p>
+
+			<p class="header-text">
+				Size
+			</p>
+			<p class="header-text">
+				Download
+			</p>
+
+		</div>
+
+		<FileItem/>
+		<FileItem/>
+		<FileItem/>
+		<FileItem/>
+	</div>
+
+</div>
+
+@code {
+
+	private string Path = "Class Backup";
+
+	private void Click()
+	{
+
+	}
+
+
+}
