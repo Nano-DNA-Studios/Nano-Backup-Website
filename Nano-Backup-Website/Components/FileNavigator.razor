@@ -65,9 +65,18 @@
 		FullPath = NavService.FullPath;
 	}
 
-	private void HandleFolderNavigation(BackupFile folder)
+	private void HandleFolderNavigation(BackupFile file)
 	{
-		NavService.NavigateFolder(folder);
+		if (file.IsFile)
+		{
+			string safePath = Uri.EscapeDataString(NavService.FullPath);
+			string safeName = Uri.EscapeDataString(file.Name);
+
+			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}", forceLoad: true);
+			return;
+		}
+		
+		NavService.NavigateFolder(file);
 		Update();
 	}
 }

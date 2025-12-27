@@ -14,6 +14,8 @@ namespace NanoBackupWebsite
                 .AddInteractiveServerComponents();
 
             builder.Services.AddScoped<FileNavigatorService>();
+            builder.Services.AddControllers();
+
 
             var app = builder.Build();
 
@@ -32,6 +34,8 @@ namespace NanoBackupWebsite
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
+            app.MapControllers();
 
             app.Run();
         }

@@ -8,7 +8,7 @@ namespace NanoBackupWebsite
 
         public List<BackupFile> CurrentFiles;
 
-        private Stack<string> Path;
+        private Stack<string> Directories;
 
         private string RootPath;
 
@@ -18,7 +18,7 @@ namespace NanoBackupWebsite
         public FileNavigatorService()
         {
             Root = new List<BackupFile>();
-            Path = new Stack<string>();
+            Directories = new Stack<string>();
             RootPath = "Class Backups";
 
             FullPath = GetFullPath();
@@ -75,35 +75,35 @@ namespace NanoBackupWebsite
         {
             string fullPath = RootPath;
 
-            string[] paths = Path.ToArray();
+            string[] paths = Directories.ToArray();
 
             for (int i = paths.Length - 1; i >= 0; i--)
-                fullPath += $"/{paths[i]}";
+                fullPath = Path.Combine(fullPath, paths[i]);
 
             return fullPath;
         }
 
         public void NavigateFolder(BackupFile folder)
         {
-            Path.Push(folder.Name);
+            Directories.Push(folder.Name);
             CurrentFiles = folder.Children;
             FullPath = GetFullPath();
         }
 
         public void GoHome()
         {
-            Path.Clear();
+            Directories.Clear();
             CurrentFiles = Root;
             FullPath = GetFullPath();
         }
 
         public void GoBack()
         {
-            Path.Pop();
+            Directories.Pop();
             CurrentFiles = Root;
 
             if (CurrentFiles[0].Parent != null && CurrentFiles[0].Parent?.Parent != null)
-                CurrentFiles = CurrentFiles[0].Parent.Parent.Children;
+                CurrentFiles = CurrentFiles[0].Parent?.Parent?.Children;
             else
                 CurrentFiles = Root;
 
