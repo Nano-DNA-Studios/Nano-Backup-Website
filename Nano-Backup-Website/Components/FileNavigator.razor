@@ -1,4 +1,7 @@
-﻿<div>
+﻿@using NanoBackupWebsite
+@inject FileNavigatorService NavService
+
+<div>
 	<!-- Add Navigation Bar Here-->
 	<div class="navigation-bar">
 		<img src="backbtn.svg" class="btn" alt="Back" />
@@ -23,10 +26,11 @@
 
 		</div>
 
-		<FileItem/>
-		<FileItem/>
-		<FileItem/>
-		<FileItem/>
+		@foreach (var file in NavService.Files)
+		{
+			<FileItem File="file"/>	
+		}
+
 	</div>
 
 </div>
