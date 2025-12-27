@@ -1,4 +1,7 @@
-﻿<div class="folder-item" onClick={this.props.onClick}>
+﻿@using Microsoft.AspNetCore.Mvc
+@rendermode InteractiveServer
+
+<div class="folder-item" @onclick="FileClick">
 	<div class="folder-item-image">
 		<img style=" width: 50%; justify-content:center" src=@GetImage() alt="Folder Icon" />
 	</div>
@@ -11,22 +14,37 @@
 
 @code {
 
-	[Parameter] 
-	public BackupFile File { get; set; }
+    [Parameter]
+    public BackupFile File { get; set; }
 
-	private string GetImage()
-	{
-		if (File.IsFile)
-			return "document.svg";
-		else
-			return "folder.svg";
-	}
+    [Parameter]
+    public EventCallback<BackupFile> OnFolderClick { get; set; }
 
-	private string GetVisibility()
-	{
-		if (File.IsFile)
-			return "visible";
-		else
-			return "hidden";
-	}
+    private string GetImage()
+    {
+        if (File.IsFile)
+            return "document.svg";
+        else
+            return "folder.svg";
+    }
+
+    private string GetVisibility()
+    {
+        if (File.IsFile)
+            return "visible";
+        else
+            return "hidden";
+    }
+
+    private void FileClick()
+    {
+        if (!File.IsFile)
+        {
+            OnFolderClick.InvokeAsync(File);
+            return;
+        }
+
+        Console.WriteLine("Download!");
+    }
+
 }

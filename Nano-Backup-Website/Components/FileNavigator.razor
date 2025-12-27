@@ -1,12 +1,13 @@
 ﻿@using NanoBackupWebsite
+@rendermode InteractiveServer
 @inject FileNavigatorService NavService
+@inject NavigationManager Nav
 
 <div>
-	<!-- Add Navigation Bar Here-->
 	<div class="navigation-bar">
-		<img src="backbtn.svg" class="btn" alt="Back" />
-		<img src="home.svg" class="btn" alt="Home" />
-		@Path
+		<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
+		<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
+		@FullPath
 	</div>
 	<div class="file-view">
 		<div class="header">
@@ -26,9 +27,9 @@
 
 		</div>
 
-		@foreach (var file in NavService.Files)
+		@foreach (var file in Files)
 		{
-			<FileItem File="file"/>	
+			<FileItem File="file" OnFolderClick="HandleFolderNavigation" />
 		}
 
 	</div>
@@ -37,12 +38,36 @@
 
 @code {
 
-	private string Path = "Class Backup";
+	private string FullPath = "";
 
-	private void Click()
+	private BackupFile[] Files;
+
+	protected override async Task OnInitializedAsync()
 	{
-
+		Files = NavService.CurrentFiles.ToArray();
 	}
 
+	private void GoHome()
+	{
+		NavService.GoHome();
+		Update();
+	}
 
+	private void GoBack()
+	{
+		NavService.GoBack();
+		Update();
+	}
+
+	private void Update()
+	{
+		Files = NavService.CurrentFiles.ToArray();
+		FullPath = NavService.FullPath;
+	}
+
+	private void HandleFolderNavigation(BackupFile folder)
+	{
+		NavService.NavigateFolder(folder);
+		Update();
+	}
 }

@@ -1,50 +1,113 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text.Json;
 
 namespace NanoBackupWebsite
 {
     public class FileNavigatorService
     {
-        public List<BackupFile> Files;
+        public List<BackupFile> Root;
+
+        public List<BackupFile> CurrentFiles;
+
+        private Stack<string> Path;
+
+        private string RootPath;
+
+        public string FullPath;
+
 
         public FileNavigatorService()
         {
-            Files = new List<BackupFile>();
+            Root = new List<BackupFile>();
+            Path = new Stack<string>();
+            RootPath = "Class Backups";
 
+            FullPath = GetFullPath();
+
+
+            ParseJSON();
+
+            CurrentFiles = Root;
+        }
+
+        private void ParseJSON()
+        {
             string jsonString = File.ReadAllText("ClassBackups.json");
 
-            JsonNode rootNode = JsonNode.Parse(jsonString);
+            using JsonDocument doc = JsonDocument.Parse(jsonString);
 
-            // 2. Treat the root as an array
-            JsonArray topLevelItems = rootNode.AsArray();
+            JsonElement root = doc.RootElement;
 
-            Console.WriteLine("--- Top Level Folders ---");
+            Root = ParseJSONRecursive(root, null);
+        }
 
-            foreach (var item in topLevelItems)
+        private List<BackupFile> ParseJSONRecursive(JsonElement element, BackupFile? parent)
+        {
+            Console.WriteLine($"Current Element : {element}, Raw Text : {element.GetRawText()}");
+
+            if (element.GetRawText() == "null")
+                return new List<BackupFile>();
+
+            if (element.GetArrayLength() == 0)
+                return new List<BackupFile>();
+
+            List<BackupFile> files = new List<BackupFile>();
+
+            foreach (JsonElement item in element.EnumerateArray())
             {
-                // Extract property values manually
-                string name = item["Name"]?.ToString();
-                bool isFile = (bool)item["IsFile"];
-                string size = item["Size"]?.ToString();
+                string? name = item.GetProperty("Name").GetString();
+                bool isFile = (bool)item.GetProperty("IsFile").GetBoolean();
+                string? size = item.GetProperty("Size").GetString();
+                JsonElement children = item.GetProperty("Content");
 
-                if (!isFile)
-                {
-                    Console.WriteLine($"Folder: {name}");
+                if (name == null)
+                    name = string.Empty;
 
-                    // 3. Drill down into "1B" specifically
-                    if (name == "1B")
-                    {
-                        Console.WriteLine("  Contents of 1B:");
-                        JsonArray contents = item["Content"]?.AsArray();
+                if (size == null)
+                    size = string.Empty;
 
-                        foreach (var subItem in contents)
-                        {
-                            Console.WriteLine($"    - {subItem["Name"]} ({subItem["Size"]})");
-                        }
-                    }
-                }
-
-                Files.Add(new BackupFile(name, isFile, size));
+                files.Add(new BackupFile(name, isFile, size, parent, ParseJSONRecursive(children, parent)));
             }
+
+            return files;
+        }
+
+        private string GetFullPath()
+        {
+            string fullPath = RootPath;
+
+            string[] paths = Path.ToArray();
+
+            for (int i = paths.Length - 1; i >= 0; i--)
+                fullPath += $"/{paths[i]}";
+
+            return fullPath;
+        }
+
+        public void NavigateFolder(BackupFile folder)
+        {
+            Path.Push(folder.Name);
+            CurrentFiles = folder.Children;
+            FullPath = GetFullPath();
+        }
+
+        public void GoHome()
+        {
+            Path.Clear();
+            CurrentFiles = Root;
+            FullPath = GetFullPath();
+        }
+
+        public void GoBack()
+        {
+            Path.Pop();
+            CurrentFiles = Root;
+
+            if (CurrentFiles[0].Parent != null && CurrentFiles[0].Parent?.Parent != null)
+                CurrentFiles = CurrentFiles[0].Parent.Parent.Children;
+            else
+                CurrentFiles = Root;
+
+            FullPath = GetFullPath();
         }
     }
 }
