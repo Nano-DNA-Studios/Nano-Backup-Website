@@ -4,6 +4,9 @@ namespace NanoBackupWebsite
 {
     public class Program
     {
+        private static int HTTPPort = 80;
+        private static int HTTPSPort = 443;
+
         public static void Main(string[] args)
         {
             LoadEnv();
@@ -18,21 +21,15 @@ namespace NanoBackupWebsite
 
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(80); // HTTP
-
-                // Only try to use HTTPS if a path is provided
-                if (!string.IsNullOrEmpty(certPath))
+                options.ListenAnyIP(HTTPPort); // HTTP
+                options.ListenAnyIP(HTTPSPort, listenOptions =>
                 {
-                    options.ListenAnyIP(443, listenOptions =>
-                    {
-                        listenOptions.UseHttps(certPath, certPassword);
-                    });
-                }
+                    listenOptions.UseHttps(certPath, certPassword);
+                });
             });
 
             // Add services to the container.
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-
             builder.Services.AddScoped<FileNavigatorService>();
             builder.Services.AddControllers();
 
