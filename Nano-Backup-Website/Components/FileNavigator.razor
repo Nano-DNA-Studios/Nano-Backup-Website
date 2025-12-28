@@ -3,48 +3,74 @@
 @inject FileNavigatorService NavService
 @inject NavigationManager Nav
 
-<div>
-	<div class="navigation-bar">
+<div class="main-container">
+
+	@if (Visible)
+	{
+	<div class="error-message">
+        <div class="error-content">
+            <h1>Error Downloading File</h1>
+            <p>There was an Error Downloading the file, If the download fails again contact MrDNA</p>
+            <button class="error-button" @onclick="CloseError">Click to Close</button>
+        </div>
+    </div>
+	}
+	<div>
+		<div class="navigation-bar">
 		<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
 		<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
 		@FullPath
-	</div>
-	<div class="file-view">
-		<div class="header">
-			<div class="header-img">
-				<img style="width:50%" src="document.svg" alt="Folder Icon" />
-			</div>
-			<p class="header-text" style="flex:4">
-				Name
-			</p>
+		</div>
+		<div class="file-view">
+			<div class="header">
+				<div class="header-img">
+					<img style="width:50%" src="document.svg" alt="Folder Icon" />
+				</div>
+				<p class="header-text" style="flex:4">
+					Name
+				</p>
 
-			<p class="header-text">
-				Size
-			</p>
-			<p class="header-text">
-				Download
-			</p>
+				<p class="header-text">
+					Size
+				</p>
+				<p class="header-text">
+					Download
+				</p>
+
+			</div>
+
+			@foreach (var file in Files)
+			{
+				<FileItem File="file" OnFolderClick="HandleFolderNavigation" />
+			}
 
 		</div>
-
-		@foreach (var file in Files)
-		{
-			<FileItem File="file" OnFolderClick="HandleFolderNavigation" />
-		}
-
 	</div>
-
 </div>
 
 @code {
 
 	private string FullPath = "";
 
-	private BackupFile[] Files;
+	private BackupFile[] Files = new BackupFile[0];
 
-	protected override async Task OnInitializedAsync()
+	private bool Visible = false;
+
+	protected override void OnInitialized()
 	{
+		FullPath = NavService.FullPath;
 		Files = NavService.CurrentFiles.ToArray();
+
+		var uri = Nav.ToAbsoluteUri(Nav.Uri);
+		if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("error", out var error))
+		{
+			Visible = true;
+		}
+	}
+
+	private void CloseError()
+	{
+		Visible = false;
 	}
 
 	private void GoHome()
@@ -71,8 +97,9 @@
 		{
 			string safePath = Uri.EscapeDataString(NavService.FullPath);
 			string safeName = Uri.EscapeDataString(file.Name);
+			string returnUrl = Uri.EscapeDataString(Nav.BaseUri);
 
-			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}", forceLoad: true);
+			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
 			return;
 		}
 		
