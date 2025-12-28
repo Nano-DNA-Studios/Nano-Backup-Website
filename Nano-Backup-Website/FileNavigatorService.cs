@@ -14,7 +14,6 @@ namespace NanoBackupWebsite
 
         public string FullPath;
 
-
         public FileNavigatorService()
         {
             Root = new List<BackupFile>();
@@ -22,7 +21,6 @@ namespace NanoBackupWebsite
             RootPath = "Class Backups";
 
             FullPath = GetFullPath();
-
 
             ParseJSON();
 
@@ -42,8 +40,6 @@ namespace NanoBackupWebsite
 
         private List<BackupFile> ParseJSONRecursive(JsonElement element, BackupFile? parent)
         {
-            Console.WriteLine($"Current Element : {element}, Raw Text : {element.GetRawText()}");
-
             if (element.GetRawText() == "null")
                 return new List<BackupFile>();
 
@@ -55,7 +51,7 @@ namespace NanoBackupWebsite
             foreach (JsonElement item in element.EnumerateArray())
             {
                 string? name = item.GetProperty("Name").GetString();
-                bool isFile = (bool)item.GetProperty("IsFile").GetBoolean();
+                bool isFile = item.GetProperty("IsFile").GetBoolean();
                 string? size = item.GetProperty("Size").GetString();
                 JsonElement children = item.GetProperty("Content");
 

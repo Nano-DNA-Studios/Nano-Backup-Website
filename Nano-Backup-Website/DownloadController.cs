@@ -15,7 +15,7 @@ namespace NanoBackupWebsite
             string path = Path.Combine(baseFolder, fullPath, fileName);
 
             if (!System.IO.File.Exists(path))
-                return NotFound();
+                return NoContent();
 
             FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
 
