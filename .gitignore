@@ -49,3 +49,5 @@ package-lock.json
 package.json
 *.pfx
 *.env
+*.conf
+/Nano-Backup-Website/Certification
