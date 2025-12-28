@@ -6,17 +6,42 @@ namespace NanoBackupWebsite
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            LoadEnv();
 
-            //Allow the Webiste to be accessed from http://localhost:5000
-            builder.WebHost.UseUrls("http://*:5000");
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            string certPath = builder.Configuration["CertPath"] ?? "";
+            string certPassword = builder.Configuration["CertPassword"] ?? "";
+
+            if (string.IsNullOrEmpty(certPath) || string.IsNullOrEmpty(certPassword) || !Path.Exists(certPath))
+                throw new Exception("Certification Path or Password are not Set Properly");
+
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(80); // HTTP
+
+                // Only try to use HTTPS if a path is provided
+                if (!string.IsNullOrEmpty(certPath))
+                {
+                    options.ListenAnyIP(443, listenOptions =>
+                    {
+                        listenOptions.UseHttps(certPath, certPassword);
+                    });
+                }
+            });
 
             // Add services to the container.
-            builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
+            builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
             builder.Services.AddScoped<FileNavigatorService>();
             builder.Services.AddControllers();
+
+            builder.Services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
 
             var app = builder.Build();
 
@@ -24,21 +49,41 @@ namespace NanoBackupWebsite
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-
             app.UseStaticFiles();
             app.UseAntiforgery();
-
-            app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
-
+            app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static void LoadEnv()
+        {
+            string envPath = ".env";
+
+            if (!Path.Exists(envPath))
+                return;
+
+            foreach (string line in File.ReadLines(envPath))
+            {
+                //Skip Empty Lines and Comments 
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                    continue;
+
+                string[] parts = line.Split('=');
+
+                if (parts.Length != 2)
+                    continue;
+
+                var key = parts[0];
+                var value = parts[1];
+
+                Environment.SetEnvironmentVariable(key, value);
+            }
         }
     }
 }
