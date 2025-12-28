@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update=".env">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Certification\certification.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
