@@ -9,5 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Certification\certification.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
