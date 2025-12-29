@@ -26,6 +26,10 @@ jobs:
 
       - name: Run .NET Restore to reload NuGet Packages
         run: dotnet restore
+
+      - name: Create Websites Folder
+        shell: bash
+        run: mkdir Websites
         
   build-source:
     needs: setup
@@ -55,10 +59,6 @@ jobs:
       matrix:
         platforms: ["win-x64", "linux-x64"]
     steps:
-      - name: Create nupkg Folder
-        shell: bash
-        run: mkdir Websites
-
       - name: Compress Standalone Source
         shell: bash
         run: tar -czf ./Websites/${{ github.event.repository.name }}-${{ matrix.platforms }}.tar.gz -C ${{ github.event.repository.name }}/bin/Release/net8.0/${{ matrix.platforms }}/publish .

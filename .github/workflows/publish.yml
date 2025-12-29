@@ -25,7 +25,11 @@ jobs:
           clean: true
 
       - name: Run .NET Restore to reload NuGet Packages
-        run: dotnet restore 
+        run: dotnet restore
+
+      - name: Create Websites Folder
+        shell: bash
+        run: mkdir Websites
 
   version:
     runs-on: ["self-hosted", "run-${{github.run_id}}"]
@@ -86,7 +90,7 @@ jobs:
       matrix:
         platforms: ["win-x64", "linux-x64"]
     steps:
-      - name: Create nupkg Folder
+      - name: Create Websites Folder
         shell: bash
         run: mkdir Websites
 
