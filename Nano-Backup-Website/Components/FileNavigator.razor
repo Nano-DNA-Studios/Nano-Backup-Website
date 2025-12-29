@@ -4,40 +4,23 @@
 @inject NavigationManager Nav
 
 <div class="main-container">
-
 	@if (Visible)
 	{
 		<Error_Message OnButtonClick="CloseError" />
 	}
 	<div>
 		<div class="navigation-bar">
-		<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
-		<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
-		@FullPath
+			<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
+			<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
+			@FullPath
 		</div>
 		<div class="file-view">
-			<div class="header">
-				<div class="header-img">
-					<img style="width:50%" src="document.svg" alt="Folder Icon" />
-				</div>
-				<p class="header-text" style="flex:4">
-					Name
-				</p>
-
-				<p class="header-text">
-					Size
-				</p>
-				<p class="header-text">
-					Download
-				</p>
-
-			</div>
+			<FileNavigatorHeader />
 
 			@foreach (var file in Files)
 			{
 				<FileItem File="file" OnFolderClick="HandleFolderNavigation" />
 			}
-
 		</div>
 	</div>
 </div>
@@ -96,7 +79,7 @@
 			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
 			return;
 		}
-		
+
 		NavService.NavigateFolder(file);
 		Update();
 	}
