@@ -47,3 +47,7 @@ msbuild.wrn
 node_modules/
 package-lock.json
 package.json
+*.pfx
+*.env
+*.conf
+/Nano-Backup-Website/Certification

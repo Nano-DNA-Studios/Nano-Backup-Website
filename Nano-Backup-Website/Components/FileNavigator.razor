@@ -1,0 +1,86 @@
+﻿@using NanoBackupWebsite
+@rendermode InteractiveServer
+@inject FileNavigatorService NavService
+@inject NavigationManager Nav
+
+<div class="main-container">
+	@if (Visible)
+	{
+		<Error_Message OnButtonClick="CloseError" />
+	}
+	<div>
+		<div class="navigation-bar">
+			<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
+			<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
+			@FullPath
+		</div>
+		<div class="file-view">
+			<FileNavigatorHeader />
+
+			@foreach (var file in Files)
+			{
+				<FileItem File="file" OnFolderClick="HandleFolderNavigation" />
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+
+	private string FullPath = "";
+
+	private BackupFile[] Files = new BackupFile[0];
+
+	private bool Visible = false;
+
+	protected override void OnInitialized()
+	{
+		FullPath = NavService.FullPath;
+		Files = NavService.CurrentFiles.ToArray();
+
+		var uri = Nav.ToAbsoluteUri(Nav.Uri);
+		if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("error", out var error))
+		{
+			Visible = true;
+		}
+	}
+
+	private void CloseError()
+	{
+		Visible = false;
+	}
+
+	private void GoHome()
+	{
+		NavService.GoHome();
+		Update();
+	}
+
+	private void GoBack()
+	{
+		NavService.GoBack();
+		Update();
+	}
+
+	private void Update()
+	{
+		Files = NavService.CurrentFiles.ToArray();
+		FullPath = NavService.FullPath;
+	}
+
+	private void HandleFolderNavigation(BackupFile file)
+	{
+		if (file.IsFile)
+		{
+			string safePath = Uri.EscapeDataString(NavService.FullPath);
+			string safeName = Uri.EscapeDataString(file.Name);
+			string returnUrl = Uri.EscapeDataString(Nav.BaseUri);
+
+			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
+			return;
+		}
+
+		NavService.NavigateFolder(file);
+		Update();
+	}
+}

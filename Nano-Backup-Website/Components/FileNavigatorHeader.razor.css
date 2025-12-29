@@ -1,0 +1,30 @@
+﻿
+.header {
+    display: flex;
+    flex-direction: row;
+    background-color: #171717;
+    border-radius: 20px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    width: 100%;
+    align-items: center;
+    color: white;
+}
+
+.header-img {
+    flex: 1;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    height: 6em;
+}
+
+.header-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    font-size: 28px;
+    height: 100%;
+    margin: 0;
+}

@@ -1,0 +1,18 @@
+﻿<div class="error-message">
+    <div class="error-content">
+        <h1>Error Downloading File</h1>
+        <p>There was an Error Downloading the file, If the download fails again contact MrDNA</p>
+        <button class="error-button" @onclick="ButtonClick">Click to Close</button>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback OnButtonClick { get; set; }
+
+    private void ButtonClick()
+    {
+        OnButtonClick.InvokeAsync();
+    }
+}
