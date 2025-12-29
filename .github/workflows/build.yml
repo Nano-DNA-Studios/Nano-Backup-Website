@@ -55,10 +55,15 @@ jobs:
       matrix:
         platforms: ["win-x64", "linux-x64"]
     steps:
+
+      - name: Create nupkg Folder
+        shell: bash
+        run: mkdir nupkg
+
       - name: Compress Standalone Source
         shell: bash
         run: tar -czf ./nupkg/${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz -C ${{ github.event.repository.name }}/bin/Release/net8.0/${{ matrix.platforms }}/publish .
-
+      
       - name: Check for Compressed Data
         shell: bash
         run: ls
