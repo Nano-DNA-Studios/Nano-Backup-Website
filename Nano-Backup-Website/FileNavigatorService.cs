@@ -95,8 +95,8 @@ namespace NanoBackupWebsite
 
         public void GoBack()
         {
-            Directories.Pop();
-            CurrentFiles = Root;
+            if (Directories.Count > 0)
+                Directories.Pop();
 
             if (CurrentFiles[0].Parent != null && CurrentFiles[0].Parent?.Parent != null)
                 CurrentFiles = CurrentFiles[0].Parent?.Parent?.Children;
