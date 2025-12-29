@@ -7,13 +7,7 @@
 
 	@if (Visible)
 	{
-	<div class="error-message">
-        <div class="error-content">
-            <h1>Error Downloading File</h1>
-            <p>There was an Error Downloading the file, If the download fails again contact MrDNA</p>
-            <button class="error-button" @onclick="CloseError">Click to Close</button>
-        </div>
-    </div>
+		<Error_Message OnButtonClick="CloseError" />
 	}
 	<div>
 		<div class="navigation-bar">
