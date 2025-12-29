@@ -25,7 +25,7 @@ jobs:
           clean: true
 
       - name: Run .NET Restore to reload NuGet Packages
-        run: dotnet restore ${{ github.event.repository.name }}/
+        run: dotnet restore
         
   build-source:
     needs: setup
