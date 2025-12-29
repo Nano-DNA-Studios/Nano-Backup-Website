@@ -13,7 +13,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{02EA68
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{66F33680-BCBA-4AE0-83DE-261BFF199432}"
 	ProjectSection(SolutionItems) = preProject
-		..\Docker\Dockerfile = ..\Docker\Dockerfile
+		..\.dockerignore = ..\.dockerignore
+		..\Dockerfile = ..\Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{6868FE9B-A20B-438A-B2BC-D25A158DB1C7}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
 	EndProjectSection
 EndProject
 Global
