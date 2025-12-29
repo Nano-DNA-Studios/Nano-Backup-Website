@@ -17,6 +17,8 @@ namespace NanoBackupWebsite
             if (!System.IO.File.Exists(path))
                 return Redirect($"{returnUrl}?error=NotFound");
 
+            Console.WriteLine($"Downloading File : {fileName} from {path}");
+
             FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
 
             return File(fs, "application/octet-stream", fileName, true);
