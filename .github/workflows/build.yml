@@ -45,3 +45,32 @@ jobs:
       - name: Build Docker Image
         shell: bash
         run: docker build -t ghcr.io/nano-dna-studios/nano-backup-website:latest .
+
+  upload-source:
+    runs-on: ["self-hosted", "run-${{github.run_id}}"]
+    needs: [build-source, version]
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        platforms: ["win-x64", "linux-x64"]
+    steps:
+      - name: Compress Standalone Source
+        shell: bash
+        run: tar -czf ./nupkg/${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz -C ${{ github.event.repository.name }}/bin/Release/net8.0/${{ matrix.platforms }}/publish .
+
+      - name: Check for Compressed Data
+        shell: bash
+        run: ls
+
+      - name: Check for Compressed Data
+        shell: bash
+        working-directory: ./nupkg
+        run: ls       
+        
+      #- name: Upload Standalone Sources to Release
+      #  working-directory: ./nupkg
+      #  shell: bash
+      #  run: |
+      #    echo "Uploading ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz as a Release Asset"
+      #    gh release upload "${{ github.event.release.tag_name }}" "${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz" --repo ${{ github.repository }}
