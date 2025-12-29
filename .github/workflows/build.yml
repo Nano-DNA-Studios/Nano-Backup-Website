@@ -25,7 +25,11 @@ jobs:
           clean: true
 
       - name: Run .NET Restore to reload NuGet Packages
-        run: dotnet restore ${{ github.event.repository.name }}/
+        run: dotnet restore
+
+      - name: Create Websites Folder
+        shell: bash
+        run: mkdir Websites
         
   build-source:
     needs: setup
@@ -45,3 +49,16 @@ jobs:
       - name: Build Docker Image
         shell: bash
         run: docker build -t ghcr.io/nano-dna-studios/nano-backup-website:latest .
+
+  upload-source:
+    runs-on: ["self-hosted", "run-${{github.run_id}}"]
+    needs: [build-source]
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        platforms: ["win-x64", "linux-x64"]
+    steps:
+      - name: Compress Standalone Source
+        shell: bash
+        run: tar -czf ./Websites/${{ github.event.repository.name }}-${{ matrix.platforms }}.tar.gz -C ${{ github.event.repository.name }}/bin/Release/net8.0/${{ matrix.platforms }}/publish .

@@ -25,7 +25,11 @@ jobs:
           clean: true
 
       - name: Run .NET Restore to reload NuGet Packages
-        run: dotnet restore 
+        run: dotnet restore
+
+      - name: Create Websites Folder
+        shell: bash
+        run: mkdir Websites
 
   version:
     runs-on: ["self-hosted", "run-${{github.run_id}}"]
@@ -76,3 +80,27 @@ jobs:
       - name: Build and Push
         shell: bash
         run: docker push ghcr.io/nano-dna-studios/nano-backup-website:${{ needs.version.outputs.version }}
+
+  upload-source:
+    runs-on: ["self-hosted", "run-${{github.run_id}}"]
+    needs: [build-source, version]
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        platforms: ["win-x64", "linux-x64"]
+    steps:
+      - name: Create Websites Folder
+        shell: bash
+        run: mkdir Websites
+
+      - name: Compress Standalone Source
+        shell: bash
+        run: tar -czf ./Websites/${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz -C ${{ github.event.repository.name }}/bin/Release/net8.0/${{ matrix.platforms }}/publish .
+      
+      - name: Upload Standalone Sources to Release
+        working-directory: ./Websites
+        shell: bash
+        run: |
+          echo "Uploading ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz as a Release Asset"
+          gh release upload "${{ github.event.release.tag_name }}" "${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz" --repo ${{ github.repository }}
