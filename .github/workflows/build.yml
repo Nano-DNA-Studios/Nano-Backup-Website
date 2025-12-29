@@ -48,7 +48,7 @@ jobs:
 
   upload-source:
     runs-on: ["self-hosted", "run-${{github.run_id}}"]
-    needs: [build-source, version]
+    needs: [build-source]
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
