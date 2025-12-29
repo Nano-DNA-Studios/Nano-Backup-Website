@@ -66,11 +66,4 @@ jobs:
       - name: Check for Compressed Data
         shell: bash
         working-directory: ./nupkg
-        run: ls       
-        
-      #- name: Upload Standalone Sources to Release
-      #  working-directory: ./nupkg
-      #  shell: bash
-      #  run: |
-      #    echo "Uploading ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz as a Release Asset"
-      #    gh release upload "${{ github.event.release.tag_name }}" "${{ github.event.repository.name }}-${{ needs.version.outputs.version }}-${{ matrix.platforms }}.tar.gz" --repo ${{ github.repository }}
+        run: ls
