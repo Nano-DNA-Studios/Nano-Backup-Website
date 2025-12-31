@@ -5,5 +5,5 @@ CREATE TABLE nanobackupdatabase(
 	size_bytes BIGINT DEFAULT 0,
 	path TEXT,
 	parent_id INTEGER REFERENCES nanobackupdatabase(id),
-	file_data BYTEA
+	file_data OID
 );
