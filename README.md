@@ -11,7 +11,7 @@ This Website is currently being hosted on a dedicated Mini PC in Waterloo.
 
 # Release Versions
 ## Current Website Version
-v0.2.0 - Dec 28 2025
+v0.2.1 - Dec 30 2025
 
 ## Versions
 v0.1.3 - May 22 2025 - Added Organized Version of NE 336. Missing Files were added and Course Organized. Removed some overprotective rules 
@@ -27,6 +27,8 @@ v0.1.7 - Oct 20 2025 - Added 1A Folder with NE 121 Assessments with Answers, add
 v0.1.8 - Nov 11 2025 - Added Software Folder with a few Windows Softwares that are used in Class
 
 v0.2.0 - Dec 28 2025 - Improved Website by remaking it in Blazor/DotNet/C# Increasing Reliability and Download Speed
+
+v0.2.1 - Dec 30 2025 - Substantially Reduced the size of the Docker Container hosting the website
 
 # Contact
 For Additional Support, Contact MrDNAlex through the following email : ``Mr.DNAlex.2003@gmail.com``.
