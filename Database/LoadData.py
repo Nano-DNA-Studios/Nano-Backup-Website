@@ -3,7 +3,8 @@ import dotenv
 from dotenv import load_dotenv
 import psycopg2
 
-BASEPATH = "E:\\Backups\\Important Backup\\School\\University Class Backups"
+#BASEPATH = "E:\\Backups\\Important Backup\\School\\University Class Backups"
+BASEPATH = "E:\Backups\Important Backup\School\Class Backup SQL Test"
 
 QueryFormat = """
         INSERT INTO nanobackupdatabase (name, is_file, size_bytes, path, parent_id, file_data)
@@ -42,38 +43,43 @@ def WriteData(connect, path, parentID):
     if (not os.path.exists(path)):
         return
     
+    virtualPath = GetVirtualPath(path)
+    name = os.path.basename(virtualPath)
+    isFile = os.path.isfile(path)
+    
+    if (isFile):
+        fileSizeBytes = os.path.getsize(path)
+    else:
+        fileSizeBytes = GetDirectorySize(path)
+    
     # Check if Folder, Add it to the database
     if (os.path.isfile(path)):
-        virtualPath = GetVirtualPath(path)
-        name = os.path.basename(virtualPath)
-        isFile = os.path.isfile(path)
-        fileSizeBytes = os.path.getsize(path)
         
         with connect.cursor() as cur:
+            oid = None
+            lobj = connect.lobject(0, 'wb', 0) # WB = Write Bytes
             with open(path, 'rb') as f:
-                fileData = f.read()
-                cur.execute(QueryFormat, (name, isFile, fileSizeBytes, virtualPath, parentID, fileData))
+                lobj.write(f.read())
+                
+                #fileData = f.read()
+            oid = lobj.oid
+            lobj.close()
+            cur.execute(QueryFormat, (name, isFile, fileSizeBytes, virtualPath, parentID, oid))
             
             fileID = cur.fetchone()[0]
             connect.commit()
             
-            print(f"Wrote File ({fileID}) {path}")
+            print(f"Wrote File ({fileID}) {virtualPath}")
             
         return
     
-    # Get the Directory info
-    virtualPath = GetVirtualPath(path)
-    name = os.path.basename(virtualPath)
-    isFile = os.path.isfile(path)
-    directorySizeBytes = GetDirectorySize(path)
-    
     # Write the Directory Infos
     with connect.cursor() as cur:
-        cur.execute(QueryFormat, (name, isFile, directorySizeBytes, virtualPath, parentID, None))
+        cur.execute(QueryFormat, (name, isFile, fileSizeBytes, virtualPath, parentID, None))
         directoryID = cur.fetchone()[0]
         connect.commit()
         
-        print(f"Wrote Folder ({directoryID}) {path}")
+        print(f"Wrote Folder ({directoryID}) {virtualPath}")
     
     for child in os.listdir(path):
         childPath = os.path.join(path, child)
