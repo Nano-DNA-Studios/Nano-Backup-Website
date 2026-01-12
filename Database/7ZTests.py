@@ -2,7 +2,6 @@ import py7zr
 import shutil
 from py7zr.callbacks import ExtractCallback
 import os
-import dotenv
 from dotenv import load_dotenv
 import psycopg2
 from tqdm import tqdm
@@ -110,9 +109,11 @@ def ExtractData(connect, path:str, parentID, ID7z):
             newID7z = cur.fetchone()[0]
             connect.commit()
             
-            print(f"Wrote 7Z ({fileID}) {virtualPath}")
+            print(f"Wrote 7Z ({newID7z}) {virtualPath}")
         
-        ExtractData(conn, newBasePath, parentID, fileID, newID7z)
+        for child in os.listdir(newBasePath):
+            childPath = os.path.join(newBasePath, child)
+            ExtractData(conn, childPath, newID7z, newID7z)
         
         shutil.rmtree(newBasePath)
         
@@ -141,7 +142,7 @@ def ExtractData(connect, path:str, parentID, ID7z):
     
     for child in os.listdir(path):
         childPath = os.path.join(path, child)
-        ExtractData(conn, childPath, directoryID)
+        ExtractData(conn, childPath, directoryID, ID7z)
     
 load_dotenv()
 
