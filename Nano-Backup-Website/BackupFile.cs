@@ -2,23 +2,41 @@
 {
     public class BackupFile
     {
-        public BackupFile? Parent { get; }
+        public int ParentID { get; }
+
+        public int ID { get;  }
 
         public string Name { get;}
 
         public bool IsFile { get; }
 
-        public string Size { get; }
+        public long Size { get; }
 
-        public List<BackupFile> Children { get; }
+        public string Path { get; }
 
-        public BackupFile (string name, bool isFile, string size, BackupFile? parent, List<BackupFile> children)
+        public BackupFile (string name, bool isFile, string path, long size, int id, int parentID)
         {
             Name = name;
             IsFile = isFile;
+            Path = path;
             Size = size;
-            Parent = parent;
-            Children = children;
+            ID = id;
+            ParentID = parentID;
+        }
+
+        public string GetSize()
+        {
+            return GetSizeRec(0, (double)Size);
+        }
+
+        private string GetSizeRec (int depth = 0, double remaining = 0)
+        {
+            string[] sizeSymbol = ["B", "KB", "MB", "GB", "TB"];
+
+            if (remaining < 1024)
+                return $"{remaining:0.##} {sizeSymbol[depth]}";
+
+            return GetSizeRec(depth + 1, remaining / 1024.0);
         }
     }
 }

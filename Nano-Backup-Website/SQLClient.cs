@@ -25,11 +25,11 @@ namespace NanoBackupWebsite
             ConnectionString += Password;
         }
 
-        public string[] GetFiles(int parentID)
+        public BackupFile[] GetFiles(int parentID)
         {
             string SQLQuery = "SELECT * FROM nanobackupdatabase WHERE parent_id = @id";
 
-            List<string> Files = new List<string>();
+            List<BackupFile> Files = new List<BackupFile>();
 
             using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
             {
@@ -45,9 +45,17 @@ namespace NanoBackupWebsite
                     {
                         while (reader.Read())
                         {
-                            Console.WriteLine(reader.ToString());
+                            string name = (string)reader["name"];
+                            bool isFile = (bool)reader["is_file"];
+                            string path = (string)reader["path"];
+                            long size = (long)reader["size_bytes"];
+                            int id = (int)reader["id"];
+                            int pID = (int)reader["parent_id"];
+
+                            BackupFile file = new BackupFile(name, isFile, path, size, id, pID);
+
+                            Files.Add(file);
                         }
-                           // Files.Add((string)reader["name"]);
                     }
                 }
                 catch (Exception ex)
