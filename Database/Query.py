@@ -37,4 +37,25 @@ conn = psycopg2.connect(
     port="5433"
 )
 
-get_folder_structure(conn)
+def GetFilesUnderParent(conn, parentID = 1):
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute(f"SELECT * FROM nanobackupdatabase WHERE parent_id = {parentID};")
+    
+    rows = cur.fetchall()
+    
+    if (len(rows) == 0):
+        return
+    
+    nodes = {row['id']: dict(row) for row in rows}
+    
+    for key in nodes.keys():
+        data = nodes[key]
+        print(f"{key} : {data["path"]} {data["name"]}")
+        
+    print("\n\nGetting Children...")
+        
+    for key in nodes.keys():
+        GetFilesUnderParent(conn, key)
+        
+GetFilesUnderParent(conn, 1)
+    
