@@ -14,7 +14,9 @@
 
         public string Path { get; }
 
-        public BackupFile (string name, bool isFile, string path, long size, int id, int parentID)
+        public int Parent7Z { get; }
+
+        public BackupFile (string name, bool isFile, string path, long size, int id, int parentID, int parent7Z)
         {
             Name = name;
             IsFile = isFile;
@@ -22,6 +24,7 @@
             Size = size;
             ID = id;
             ParentID = parentID;
+            Parent7Z = parent7Z;
         }
 
         public string GetSize()
