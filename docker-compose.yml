@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRESPASSWORD}
+      POSTGRES_DB: ${POSTGRESDB}
+    ports:
+      - "5433:5432" # Host 5433 -> Container 5432
+    volumes:
+      - "C:/Users/MrDNA/Downloads/nanobackupwebsite.sql:/docker-entrypoint-initdb.d/init.sql"
+
+  app:
+    build: .
+    container_name: nano-backup-website
+    depends_on:
+      - db
+    environment:
+      # CRITICAL: Use 'db' (the service name) as the Host
+      - ConnectionString=Host=db;Port=5432;Username=postgres;Password=${POSTGRESPASSWORD};Database=${POSTGRESDB}
+      - CertPath=${CertPath}
+      - CertPassword=${CertPassword}
+    volumes:
+      - ./Nano-Backup-Website/Certification:/Nano-Backup/Certification
+      - "E:/Backups/Important Backup/School/Class Backup SQL Test:/Class Backups"
+    ports:
+      - "8080:443"
+
+volumes:
+  pgdata:

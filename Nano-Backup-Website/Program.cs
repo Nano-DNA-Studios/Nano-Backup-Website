@@ -10,7 +10,7 @@ namespace NanoBackupWebsite
         public static void Main(string[] args)
         {
             LoadEnv();
-            SQLClient.Initialize();
+            //SQLClient.Initialize();
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

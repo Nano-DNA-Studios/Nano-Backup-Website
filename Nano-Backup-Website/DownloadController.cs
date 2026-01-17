@@ -10,12 +10,6 @@ namespace NanoBackupWebsite
         [HttpGet]
         public IActionResult GetFile([FromQuery] string id, [FromQuery] string fileName, [FromQuery] string returnUrl)
         {
-            // Get the Path to the File on the local machine
-            //string baseFolder = AppContext.BaseDirectory;
-
-           // if (!System.IO.File.Exists(path))
-            //    return Redirect($"{returnUrl}?error=NotFound");
-
             Console.WriteLine($"Downloading File : {fileName}");
 
             Stream stream = new SQLClient().GetFileStream(int.Parse(id));

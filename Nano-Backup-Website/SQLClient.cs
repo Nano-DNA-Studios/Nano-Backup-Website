@@ -1,5 +1,7 @@
 ﻿using Npgsql;
-using SevenZip;
+//using SevenZip;
+using SharpCompress.Archives;
+using SharpCompress.Archives.SevenZip;
 
 namespace NanoBackupWebsite
 {
@@ -7,58 +9,17 @@ namespace NanoBackupWebsite
     {
         private static string BASEPATH = @"/Class Backups";
 
-        private static string Host = "Host=localhost;";
-
-        private static string Port = "Port=5433;";
-
-        private static string Database = "Database=nanobackupwebsite;";
-
-        private static string Username = "Username=postgres;";
-
-        private static string Password = $"Password={Environment.GetEnvironmentVariable("POSTGRESPASSWORD") ?? ""};";
-
-        private static string ConnectionString = "";
+        private static string ConnectionString = Environment.GetEnvironmentVariable("ConnectionString");
 
         public SQLClient()
         {
-            ConnectionString += Host;
-            ConnectionString += Port;
-            ConnectionString += Database;
-            ConnectionString += Username;
-            ConnectionString += Password;
-
-            Set7ZPath();
         }
 
         public static void Initialize()
         {
-            ConnectionString += Host;
-            ConnectionString += Port;
-            ConnectionString += Database;
-            ConnectionString += Username;
-            ConnectionString += Password;
-
-            Set7ZPath();
             CleanDatabase();
-            ProcessBackup(BASEPATH, null, null, null);
+            //ProcessBackup(BASEPATH, null, null, null);
             UpdateDirectorySizes();
-        }
-
-        private static void Set7ZPath()
-        {
-            string dllPath = "";
-
-            if (OperatingSystem.IsLinux())
-                dllPath = "/usr/bin/7z";
-            else if (OperatingSystem.IsWindows())
-                dllPath = @"C:\Program Files\7-Zip\7z.dll";
-            else
-                throw new InvalidOperationException("The OS is not recognized and can't find 7z DLL Path");
-
-            if (!File.Exists(dllPath))
-                throw new FileNotFoundException("7z.dll not found at the specified path.");
-
-            SevenZipBase.SetLibraryPath(dllPath);
         }
 
         public Stream GetFileStream(int id)
@@ -68,31 +29,43 @@ namespace NanoBackupWebsite
             using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
             {
                 NpgsqlCommand command = new NpgsqlCommand(getFile, connection);
-
                 command.Parameters.AddWithValue("id", id);
-
                 connection.Open();
 
                 using (NpgsqlDataReader reader = command.ExecuteReader())
                 {
-                    reader.Read();
+                    if (!reader.Read()) return null;
 
                     if ((bool)reader["is_7z"])
                         return new FileStream((string)reader["path"] + ".7z", FileMode.Open, FileAccess.Read, FileShare.Read);
 
                     int parent7zId = (int)reader["parent_7z"];
+                    string targetFileName = (string)reader["name"];
 
-                    FileStream archiveFile = (FileStream)GetFileStream(parent7zId);
+                    Console.WriteLine($"Got Parent7Z ID : {parent7zId}");
 
-                    SevenZipExtractor extractor = new SevenZipExtractor(archiveFile);
+                    Stream archiveStream = GetFileStream(parent7zId);
 
-                    MemoryStream memoryStream = new MemoryStream();
+                    using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
+                    {
+                        SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e => !e.IsDirectory && e.Key.Contains(targetFileName));
 
-                    ArchiveFileInfo info = extractor.ArchiveFileData.Skip(1).ToArray()[id - parent7zId];
+                        if (entry == null)
+                            throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
 
-                    extractor.ExtractFile(info.FileName, memoryStream);
+                        Console.WriteLine($"Extracting File : {entry.Key}");
 
-                    return memoryStream;
+                        MemoryStream memoryStream = new MemoryStream((int)entry.Size);
+                        using (Stream entryStream = entry.OpenEntryStream())
+                            entryStream.CopyTo(memoryStream);
+                        
+                        memoryStream.Position = 0;
+
+                        archiveStream.Dispose();
+
+                        Console.WriteLine("File Extracted Successfully");
+                        return memoryStream;
+                    }
                 }
             }
         }
@@ -202,10 +175,10 @@ namespace NanoBackupWebsite
         /// <returns>The Path to Display on the Website and to use to Navigate within the Docker Container</returns>
         private static string GetVirtualPath(string path)
         {
-            return path.Replace(BASEPATH, "./Class Backups").Replace("\\", "/");
+            return path.Replace(BASEPATH, "/Class Backups").Replace("\\", "/");
         }
 
-        private static void ProcessBackup(string path, int? parentID, int? id7z, ArchiveFileInfo? info)
+        private static void ProcessBackup(string path, int? parentID, int? id7z, SevenZipArchiveEntry? info)
         {
             //Define the Metadata for the File
             string virtualPath = GetVirtualPath(path);
@@ -215,7 +188,7 @@ namespace NanoBackupWebsite
 
             if (info != null)
             {
-                ArchiveFileInfo realInfo = (ArchiveFileInfo)info;
+                SevenZipArchiveEntry realInfo = (SevenZipArchiveEntry)info;
                 isFile = !realInfo.IsDirectory;
                 size = (long)realInfo.Size;
             }
@@ -248,21 +221,23 @@ namespace NanoBackupWebsite
         {
             Console.WriteLine($"Extracting Metadata from 7z File {name}");
 
-            SevenZipExtractor extractor = new SevenZipExtractor(path);
+            SevenZipArchive extractor = SevenZipArchive.Open(path);
 
             name = name.Replace(".7z", "");
             path = path.Replace(".7z", "");
 
             Dictionary<string, int> directoryCache = new Dictionary<string, int>();
 
-            int archiveRootID = WriteEntryToSQL(name, false, true, extractor.UnpackedSize, GetVirtualPath(path), parentID, null);
+            int archiveRootID = WriteEntryToSQL(name, false, true, extractor.TotalUncompressSize, GetVirtualPath(path), parentID, null);
 
             directoryCache[path] = archiveRootID;
 
-            foreach (ArchiveFileInfo entry in extractor.ArchiveFileData.Skip(1))
+            foreach (SevenZipArchiveEntry entry in extractor.Entries.Skip(1))
             {
-                string entryName = Path.GetFileName(entry.FileName);
-                string entryPath = Path.Combine(path.Replace(name, ""), entry.FileName);
+                if (entry.Key == null) continue;
+
+                string entryName = Path.GetFileName(entry.Key);
+                string entryPath = Path.Combine(path.Replace(name, ""), entry.Key);
                 string parentPath = Path.GetDirectoryName(entryPath) ?? "";
 
                 int parentDirectoryID = directoryCache.ContainsKey(parentPath) ? directoryCache[parentPath] : archiveRootID;
