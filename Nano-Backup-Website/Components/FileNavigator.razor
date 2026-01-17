@@ -72,11 +72,13 @@
 	{
 		if (file.IsFile)
 		{
-			string safePath = Uri.EscapeDataString(NavService.FullPath);
+			//string safePath = Uri.EscapeDataString(NavService.FullPath);
 			string safeName = Uri.EscapeDataString(file.Name);
 			string returnUrl = Uri.EscapeDataString(Nav.BaseUri);
 
-			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
+			Console.WriteLine(file.ID);
+
+			Nav.NavigateTo($"/api/download?id={file.ID}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
 			return;
 		}
 
