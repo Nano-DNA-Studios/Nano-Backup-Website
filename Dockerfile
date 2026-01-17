@@ -9,6 +9,7 @@ RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 # Install dependencies first
 RUN apt-get update && apt-get install -y \
     libicu-dev \
+    p7zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Define the Username and Dotnet Version

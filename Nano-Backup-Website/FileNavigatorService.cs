@@ -1,6 +1,4 @@
-﻿using NanoBackupWebsite.Components;
-using System.Text.Json;
-
+﻿
 namespace NanoBackupWebsite
 {
     public class FileNavigatorService
@@ -54,7 +52,6 @@ namespace NanoBackupWebsite
             CurrentFiles = Client.GetFiles(Directories.Peek());
 
             int parent2 = Directories.Pop();
-
 
             if (Directories.Count == 0)
                 FullPath = RootPath;
