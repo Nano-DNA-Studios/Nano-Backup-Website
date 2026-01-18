@@ -103,7 +103,7 @@
 			return;
 		}
 
-		BackupFile? file = new SQLClient().Get7ZFile(firstFile.Parent7Z);
+		BackupFile? file = new SQLClient().GetFile(firstFile.Parent7Z);
 
 		if (file == null)
 			return;

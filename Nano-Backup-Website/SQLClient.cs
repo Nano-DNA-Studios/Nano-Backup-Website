@@ -110,7 +110,7 @@ namespace NanoBackupWebsite
             return Files.ToArray();
         }
 
-        public BackupFile? Get7ZFile(int id7Z)
+        public BackupFile? GetFile(int id7Z)
         {
             string SQLQuery = "SELECT * FROM nanobackupdatabase WHERE id = @id";
 

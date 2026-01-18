@@ -20,7 +20,7 @@
 	{
 		SQLClient Client = new SQLClient(); 
 
-		BackupFile? file = Client.Get7ZFile(1);
+		BackupFile? file = Client.GetFile(1);
 
 		if (file == null)
 			return;
