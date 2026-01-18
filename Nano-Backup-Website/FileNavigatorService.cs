@@ -21,7 +21,7 @@ namespace NanoBackupWebsite
             Directories = new Stack<int>();
             Has7ZParent = false;
 
-            RootPath = "./Class Backups";
+            RootPath = "/Class Backups";
             FullPath = RootPath;
 
             CurrentFiles = Client.GetFiles(1);
