@@ -13,10 +13,13 @@ namespace NanoBackupWebsite
 
         private SQLClient Client;
 
+        public bool Has7ZParent;
+
         public FileNavigatorService()
         {
             Client = new SQLClient();
             Directories = new Stack<int>();
+            Has7ZParent = false;
 
             RootPath = "./Class Backups";
             FullPath = RootPath;
@@ -30,6 +33,7 @@ namespace NanoBackupWebsite
             FullPath = folder.Path;
             Directories.Push(folder.ID);
             CurrentFiles = Client.GetFiles(folder.ID);
+            Has7ZParent = CurrentFiles[0].Parent7Z != -1;
         }
 
         public void GoHome()
@@ -37,6 +41,7 @@ namespace NanoBackupWebsite
             Directories.Clear();
             CurrentFiles = Client.GetFiles(1);
             FullPath = RootPath;
+            Has7ZParent = CurrentFiles[0].Parent7Z != -1;
         }
 
         public void GoBack()
@@ -50,6 +55,7 @@ namespace NanoBackupWebsite
             Directories.Pop();
 
             CurrentFiles = Client.GetFiles(Directories.Peek());
+            Has7ZParent = CurrentFiles[0].Parent7Z != -1;
 
             int parent2 = Directories.Pop();
 

@@ -132,6 +132,8 @@ namespace NanoBackupWebsite
 
                     using (NpgsqlDataReader reader = command.ExecuteReader())
                     {
+                        reader.Read();
+
                         string name = (string)reader["name"];
                         bool isFile = (bool)reader["is_file"];
                         string path = (string)reader["path"];
@@ -139,7 +141,7 @@ namespace NanoBackupWebsite
                         int id = (int)reader["id"];
                         int pID = (int)reader["parent_id"];
 
-                        return new BackupFile(name, isFile, path, size, id, pID, 0);
+                        return new BackupFile(name, isFile, path, size, id, pID, -1);
                     }
                 }
                 catch (Exception ex)
