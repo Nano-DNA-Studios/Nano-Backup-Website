@@ -10,7 +10,6 @@ namespace NanoBackupWebsite
         public static void Main(string[] args)
         {
             LoadEnv();
-            //SQLClient.Initialize();
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +67,6 @@ namespace NanoBackupWebsite
 
             foreach (string line in File.ReadLines(envPath))
             {
-                //Skip Empty Lines and Comments 
                 if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
                     continue;
 
