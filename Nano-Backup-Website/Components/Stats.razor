@@ -1,0 +1,32 @@
+﻿@rendermode InteractiveServer
+<link rel="stylesheet" href="shared.css" />
+
+<div class="center-text main-container">
+	<h2>Website Stats</h2>
+	<h3>Database Size : @rootFile.GetSize()</h3>
+	<h3>Files: @Files</h3>
+	<h3>Folders : @Folders</h3>
+</div>
+
+@code {
+
+	BackupFile rootFile = new BackupFile("", false, "", 0, 0, 0, 0);
+
+	int Folders = 0;
+
+	int Files = 0;
+
+	protected override void OnInitialized()
+	{
+		SQLClient Client = new SQLClient(); 
+
+		BackupFile? file = Client.Get7ZFile(1);
+
+		if (file == null)
+			return;
+
+		rootFile = file;
+		Files = Client.GetNumberOfFilesOrFolders(true);
+		Folders = Client.GetNumberOfFilesOrFolders(false);
+	}
+}
