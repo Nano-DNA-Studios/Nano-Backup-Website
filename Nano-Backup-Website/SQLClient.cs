@@ -132,8 +132,19 @@ namespace NanoBackupWebsite
                         bool isFile = (bool)reader["is_file"];
                         string path = (string)reader["path"];
                         long size = (long)reader["size_bytes"];
-                        int id = (int)reader["id"];
-                        int pID = (int)reader["parent_id"];
+
+                        int id;
+                        int pID;
+
+                        if (reader["id"] == DBNull.Value)
+                            id = 0;
+                        else
+                            id = (int)reader["id"];
+
+                        if (reader["parent_id"] == DBNull.Value)
+                           pID = 0;
+                        else
+                            pID = (int)reader["parent_id"];
 
                         return new BackupFile(name, isFile, path, size, id, pID, -1);
                     }
@@ -145,6 +156,34 @@ namespace NanoBackupWebsite
             }
 
             return null;
+        }
+
+        public int GetNumberOfFilesOrFolders (bool file)
+        {
+            string SQLQuery = "SELECT COUNT(*) FROM nanobackupdatabase WHERE is_file = @file";
+
+            using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
+            {
+                NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+
+                command.Parameters.AddWithValue("@file", file);
+
+                try
+                {
+                    connection.Open();
+
+                    object? result = command.ExecuteScalar();
+
+                    if (result != null) 
+                        return result != null ? Convert.ToInt32(result) : 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            }
+
+            return 0;
         }
     }
 }
