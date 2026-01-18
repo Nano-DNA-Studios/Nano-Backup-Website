@@ -127,17 +127,36 @@ namespace DatabaseInjector
                 string sql = @"INSERT INTO nanobackupdatabase (name, is_file, is_7z, size_bytes, path, parent_id, parent_7z) 
                                VALUES (@n, @if, @i7, @s, @p, @pid, @i7id) RETURNING id;";
 
-                var cmd = new NpgsqlCommand(sql, conn);
+                object pid;
+                object i7;
+
+                if (parentID == null)
+                    pid = DBNull.Value;
+                else
+                    pid = parentID;
+
+                if (id7z == null)
+                    i7 = DBNull.Value;
+                else
+                    i7 = id7z;
+
+                NpgsqlCommand cmd = new NpgsqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("n", name);
                 cmd.Parameters.AddWithValue("if", isFile);
                 cmd.Parameters.AddWithValue("i7", is7z);
                 cmd.Parameters.AddWithValue("s", size);
                 cmd.Parameters.AddWithValue("p", vPath);
-                cmd.Parameters.AddWithValue("pid", (object)parentID ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("i7id", (object)id7z ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("pid", pid);
+                cmd.Parameters.AddWithValue("i7id", i7);
 
                 conn.Open();
-                int newId = (int)cmd.ExecuteScalar();
+
+                object? idObj = cmd.ExecuteScalar();
+
+                if (idObj == null)
+                    return 0;
+
+                int newId = (int)idObj;
                 Console.WriteLine($"Inserted: {name} (ID: {newId})");
                 return newId;
             }

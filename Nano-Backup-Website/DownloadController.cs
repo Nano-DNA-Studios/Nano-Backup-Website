@@ -12,7 +12,7 @@ namespace NanoBackupWebsite
         {
             Console.WriteLine($"Downloading File : {fileName}");
 
-            Stream stream = new SQLClient().GetFileStream(int.Parse(id));
+            Stream? stream = new SQLClient().GetFileStream(int.Parse(id));
 
             if (stream == null)
                 return Redirect($"{returnUrl}?error=NotFound");

@@ -15,7 +15,7 @@
 @code {
 
 	[Parameter]
-	public BackupFile File { get; set; }
+	public BackupFile File { get; set; } = new BackupFile("", false, "", 0, 0, 0, 0);
 
 	[Parameter]
 	public EventCallback<BackupFile> OnFolderClick { get; set; }

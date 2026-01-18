@@ -7,7 +7,7 @@ namespace NanoBackupWebsite
     {
         private static string ConnectionString = Environment.GetEnvironmentVariable("ConnectionString") ?? "";
 
-        public Stream GetFileStream(int id)
+        public Stream? GetFileStream(int id)
         {
             string getFile = "SELECT * FROM nanobackupdatabase WHERE id = @id;";
 
@@ -29,11 +29,20 @@ namespace NanoBackupWebsite
 
                     Console.WriteLine($"Got Parent7Z ID : {parent7zId}");
 
-                    Stream archiveStream = GetFileStream(parent7zId);
+                    Stream? archiveStream = GetFileStream(parent7zId);
+
+                    if (archiveStream == null)
+                        return null;
 
                     using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
                     {
-                        SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e => !e.IsDirectory && e.Key.Contains(targetFileName));
+                        SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
+                        {
+                            if (e.Key == null)
+                                return false;
+
+                            return !e.IsDirectory && e.Key.Contains(targetFileName);
+                        });
 
                         if (entry == null)
                             throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
@@ -43,7 +52,7 @@ namespace NanoBackupWebsite
                         MemoryStream memoryStream = new MemoryStream((int)entry.Size);
                         using (Stream entryStream = entry.OpenEntryStream())
                             entryStream.CopyTo(memoryStream);
-                        
+
                         memoryStream.Position = 0;
 
                         archiveStream.Dispose();
@@ -101,7 +110,7 @@ namespace NanoBackupWebsite
             return Files.ToArray();
         }
 
-        public BackupFile Get7ZFile(int id7Z)
+        public BackupFile? Get7ZFile(int id7Z)
         {
             string SQLQuery = "SELECT * FROM nanobackupdatabase WHERE id = @id";
 
