@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRESPASSWORD}
       POSTGRES_DB: ${POSTGRESDB}
     ports:
-      - "5433:5432" # Host 5433 -> Container 5432
+      - "5433:5432"
     volumes:
       - "C:/Users/MrDNA/Downloads/nanobackupwebsite.sql:/docker-entrypoint-initdb.d/init.sql"
 
@@ -17,7 +17,6 @@ services:
     depends_on:
       - db
     environment:
-      # CRITICAL: Use 'db' (the service name) as the Host
       - ConnectionString=Host=db;Port=5432;Username=postgres;Password=${POSTGRESPASSWORD};Database=${POSTGRESDB}
       - CertPath=${CertPath}
       - CertPassword=${CertPassword}
