@@ -7,7 +7,7 @@
     <RootNamespace>NanoBackupWebsite</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
     <Platforms>AnyCPU;x64;x86</Platforms>
-		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<ServerGarbageCollection>false</ServerGarbageCollection>
 		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
@@ -16,8 +16,8 @@
     <PackageReference Include="SharpCompress" Version="0.44.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update=".env">
+	<ItemGroup>
+		<None Include="..\.env" Link=".env" Condition="Exists('.env')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Certification\certification.pfx">

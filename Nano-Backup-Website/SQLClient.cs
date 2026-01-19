@@ -7,57 +7,50 @@ namespace NanoBackupWebsite
     {
         private static string ConnectionString = Environment.GetEnvironmentVariable("ConnectionString") ?? "";
 
+        ~SQLClient()
+        {
+            GC.Collect(2, GCCollectionMode.Aggressive, true);
+        }
+
         public Stream? GetFileStream(int id)
         {
-            string getFile = "SELECT * FROM nanobackupdatabase WHERE id = @id;";
+            BackupFile? file = this.GetFile(id);
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
+            if (file == null)
+                return null;
+
+            if (file.Is7z)
+                return new FileStream(file.Path + ".7z", FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            if (file.Parent7Z == -1)
+                return new FileStream(file.Path, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            Console.WriteLine($"Got Parent7Z ID : {file.Parent7Z}");
+
+            Stream? archiveStream = GetFileStream(file.Parent7Z);
+
+            if (archiveStream == null)
+                return null;
+
+            SevenZipArchive archive = SevenZipArchive.Open(archiveStream);
+            SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
             {
-                NpgsqlCommand command = new NpgsqlCommand(getFile, connection);
-                command.Parameters.AddWithValue("id", id);
-                connection.Open();
+                if (e.Key == null)
+                    return false;
 
-                using (NpgsqlDataReader reader = command.ExecuteReader())
-                {
-                    if (!reader.Read()) return null;
+                return !e.IsDirectory && e.Key.Contains(file.Name);
+            });
 
-                    if ((bool)reader["is_7z"])
-                        return new FileStream((string)reader["path"] + ".7z", FileMode.Open, FileAccess.Read, FileShare.Read);
+            if (entry == null)
+                throw new FileNotFoundException($"Could not find {file.Name} inside the archive.");
 
-                    if (reader["parent_7z"] == DBNull.Value)
-                        return new FileStream((string)reader["path"], FileMode.Open, FileAccess.Read, FileShare.Read);
+            Console.WriteLine($"Extracting File : {entry.Key}");
 
-                    int parent7zId = (int)reader["parent_7z"];
-                    string targetFileName = (string)reader["name"];
+            archiveStream = entry.OpenEntryStream();
 
-                    Console.WriteLine($"Got Parent7Z ID : {parent7zId}");
+            archive.Dispose();
 
-                    Stream? archiveStream = GetFileStream(parent7zId);
-
-                    if (archiveStream == null)
-                        return null;
-
-                    using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
-                    {
-                        SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
-                        {
-                            if (e.Key == null)
-                                return false;
-
-                            return !e.IsDirectory && e.Key.Contains(targetFileName);
-                        });
-
-                        if (entry == null)
-                            throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
-
-                        Console.WriteLine($"Extracting File : {entry.Key}");
-
-                        archiveStream = entry.OpenEntryStream();
-
-                        return archiveStream;
-                    }
-                }
-            }
+            return archiveStream;
         }
 
         public BackupFile[] GetFiles(int parentID)
@@ -66,89 +59,100 @@ namespace NanoBackupWebsite
 
             List<BackupFile> Files = new List<BackupFile>();
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+
+            command.Parameters.AddWithValue("@id", parentID);
+
+            try
             {
-                NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+                connection.Open();
 
-                command.Parameters.AddWithValue("@id", parentID);
+                NpgsqlDataReader reader = command.ExecuteReader();
 
-                try
+                while (reader.Read())
                 {
-                    connection.Open();
+                    string name = (string)reader["name"];
+                    bool isFile = (bool)reader["is_file"];
+                    bool is7z = (bool)reader["is_7z"];
+                    string path = (string)reader["path"];
+                    long size = (long)reader["size_bytes"];
+                    int id = (int)reader["id"];
+                    int pID = (int)reader["parent_id"];
+                    int id7Z = -1;
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string name = (string)reader["name"];
-                            bool isFile = (bool)reader["is_file"];
-                            string path = (string)reader["path"];
-                            long size = (long)reader["size_bytes"];
-                            int id = (int)reader["id"];
-                            int pID = (int)reader["parent_id"];
-                            int id7Z = -1;
+                    if (!reader.IsDBNull(reader.GetOrdinal("parent_7z")))
+                        id7Z = (int)reader["parent_7z"];
 
-                            if (!reader.IsDBNull(reader.GetOrdinal("parent_7z")))
-                                id7Z = (int)reader["parent_7z"];
+                    BackupFile file = new BackupFile(name, isFile, path, size, id, pID, id7Z, is7z);
 
-                            BackupFile file = new BackupFile(name, isFile, path, size, id, pID, id7Z);
-
-                            Files.Add(file);
-                        }
-                    }
+                    Files.Add(file);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
+
+                reader.DisposeAsync();
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            command.Dispose();
+            connection.Close();
+            connection.Dispose();
 
             return Files.ToArray();
         }
 
-        public BackupFile? GetFile(int id7Z)
+        public BackupFile? GetFile(int id)
         {
             string SQLQuery = "SELECT * FROM nanobackupdatabase WHERE id = @id";
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+
+            command.Parameters.AddWithValue("@id", id);
+
+            try
             {
-                NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+                connection.Open();
 
-                command.Parameters.AddWithValue("@id", id7Z);
+                NpgsqlDataReader reader = command.ExecuteReader();
 
-                try
-                {
-                    connection.Open();
+                reader.Read();
 
-                    using (NpgsqlDataReader reader = command.ExecuteReader())
-                    {
-                        reader.Read();
+                string name = (string)reader["name"];
+                bool isFile = (bool)reader["is_file"];
+                bool is7z = (bool)reader["is_7z"];
+                string path = (string)reader["path"];
+                long size = (long)reader["size_bytes"];
+                int fileID7Z = -1;
 
-                        string name = (string)reader["name"];
-                        bool isFile = (bool)reader["is_file"];
-                        string path = (string)reader["path"];
-                        long size = (long)reader["size_bytes"];
+                int fid;
+                int pID;
 
-                        int id;
-                        int pID;
+                if (reader["id"] == DBNull.Value)
+                    fid = 0;
+                else
+                    fid = (int)reader["id"];
 
-                        if (reader["id"] == DBNull.Value)
-                            id = 0;
-                        else
-                            id = (int)reader["id"];
+                if (reader["parent_id"] == DBNull.Value)
+                    pID = 0;
+                else
+                    pID = (int)reader["parent_id"];
 
-                        if (reader["parent_id"] == DBNull.Value)
-                            pID = 0;
-                        else
-                            pID = (int)reader["parent_id"];
+                if (!reader.IsDBNull(reader.GetOrdinal("parent_7z")))
+                    fileID7Z = (int)reader["parent_7z"];
 
-                        return new BackupFile(name, isFile, path, size, id, pID, -1);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
+                reader.DisposeAsync();
+                command.Dispose();
+                connection.Close();
+                connection.Dispose();
+
+                return new BackupFile(name, isFile, path, size, fid, pID, fileID7Z, is7z);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
 
             return null;
@@ -158,25 +162,27 @@ namespace NanoBackupWebsite
         {
             string SQLQuery = "SELECT COUNT(*) FROM nanobackupdatabase WHERE is_file = @file";
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection connection = new NpgsqlConnection(ConnectionString);
+            NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+
+            command.Parameters.AddWithValue("@file", file);
+
+            try
             {
-                NpgsqlCommand command = new NpgsqlCommand(SQLQuery, connection);
+                connection.Open();
 
-                command.Parameters.AddWithValue("@file", file);
+                object? result = command.ExecuteScalar();
 
-                try
-                {
-                    connection.Open();
+                command.Dispose();
+                connection.Close();
+                connection.Dispose();
 
-                    object? result = command.ExecuteScalar();
-
-                    if (result != null)
-                        return result != null ? Convert.ToInt32(result) : 0;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
+                if (result != null)
+                    return Convert.ToInt32(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
 
             return 0;
