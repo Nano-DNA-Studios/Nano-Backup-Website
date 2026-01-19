@@ -4,7 +4,6 @@ namespace DatabaseInjector
 {
     internal class Program
     {
-        //private static string DatabasePath = @"E:\Backups\Important Backup\School\Class Backup SQL Test";
         private static string DatabasePath = @"E:/Backups/Important Backup/School/University Class Backups";
 
         static void Main(string[] args)
