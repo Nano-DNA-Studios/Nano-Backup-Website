@@ -4,7 +4,7 @@ services:
     container_name: postgres_db
     environment:
       POSTGRES_USER: ${Username}
-      POSTGRES_PASSWORD: ${POSTGRESPASSWORD}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: ${POSTGRESDB}
     volumes:
       - ${POSTGRESDBFILE}:/docker-entrypoint-initdb.d/init.sql
