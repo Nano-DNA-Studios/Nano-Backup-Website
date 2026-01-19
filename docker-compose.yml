@@ -10,13 +10,13 @@ services:
       - ${POSTGRESDBFILE}:/docker-entrypoint-initdb.d/init.sql
 
   app:
-    image: nano-backup-website
+    build: .
     container_name: nano-backup-website
     depends_on:
       - db
     environment:
       - ConnectionString=${ConnectionString}
-      - CertPath=${CertPath}
+      - CertPath=${CertPathExact}
       - CertPassword=${CertPassword}
     volumes:
       - ${CertPath}:/Nano-Backup/Certification
