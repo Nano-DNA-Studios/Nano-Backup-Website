@@ -24,8 +24,6 @@ namespace NanoBackupWebsite
 
         public void Dispose()
         {
-            Console.WriteLine("Download Controller Disposed");
-
             Stream?.Dispose();
 
             GC.Collect(2, GCCollectionMode.Aggressive, true);
