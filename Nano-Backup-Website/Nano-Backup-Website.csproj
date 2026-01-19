@@ -17,7 +17,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\.env" Link=".env">
+		<None Include="..\.env" Link=".env" Condition="Exists('.env')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Certification\certification.pfx">
