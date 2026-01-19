@@ -7,6 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nano-Backup-Website", "Nano
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
+		.env = .env
 		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
@@ -14,6 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{66F33680-BCBA-4AE0-83DE-261BFF199432}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
@@ -22,6 +24,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 		.github\workflows\build.yml = .github\workflows\build.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{36E87C1C-C2F9-4849-B351-B1D7FA750446}"
+	ProjectSection(SolutionItems) = preProject
+		Database\schema.sql = Database\schema.sql
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseInjector", "DatabaseInjector\DatabaseInjector.csproj", "{23C79381-6130-4D0B-A337-6A5B159ABA64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +42,10 @@ Global
 		{E429EF4E-5E62-4E9C-9007-2978EAEED396}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E429EF4E-5E62-4E9C-9007-2978EAEED396}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E429EF4E-5E62-4E9C-9007-2978EAEED396}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23C79381-6130-4D0B-A337-6A5B159ABA64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23C79381-6130-4D0B-A337-6A5B159ABA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23C79381-6130-4D0B-A337-6A5B159ABA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23C79381-6130-4D0B-A337-6A5B159ABA64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,109 +1,70 @@
-﻿using System.Text.Json;
-
+﻿
 namespace NanoBackupWebsite
 {
     public class FileNavigatorService
     {
-        public List<BackupFile> Root;
+        public BackupFile[] CurrentFiles { get; private set; }
 
-        public List<BackupFile> CurrentFiles;
-
-        private Stack<string> Directories;
+        private Stack<int> Directories;
 
         private string RootPath;
 
         public string FullPath;
 
+        private SQLClient Client;
+
+        public bool Has7ZParent;
+
         public FileNavigatorService()
         {
-            Root = new List<BackupFile>();
-            Directories = new Stack<string>();
-            RootPath = "Class Backups";
+            Client = new SQLClient();
+            Directories = new Stack<int>();
+            Has7ZParent = false;
 
-            FullPath = GetFullPath();
+            RootPath = "/Class Backups";
+            FullPath = RootPath;
 
-            ParseJSON();
-
-            CurrentFiles = Root;
-        }
-
-        private void ParseJSON()
-        {
-            string jsonString = File.ReadAllText("ClassBackups.json");
-
-            using JsonDocument doc = JsonDocument.Parse(jsonString);
-
-            JsonElement root = doc.RootElement;
-
-            Root = ParseJSONRecursive(root, null);
-        }
-
-        private List<BackupFile> ParseJSONRecursive(JsonElement element, BackupFile? parent)
-        {
-            if (element.GetRawText() == "null")
-                return new List<BackupFile>();
-
-            if (element.GetArrayLength() == 0)
-                return new List<BackupFile>();
-
-            List<BackupFile> files = new List<BackupFile>();
-
-            foreach (JsonElement item in element.EnumerateArray())
-            {
-                string? name = item.GetProperty("Name").GetString();
-                bool isFile = item.GetProperty("IsFile").GetBoolean();
-                string? size = item.GetProperty("Size").GetString();
-                JsonElement children = item.GetProperty("Content");
-
-                if (name == null)
-                    name = string.Empty;
-
-                if (size == null)
-                    size = string.Empty;
-
-                files.Add(new BackupFile(name, isFile, size, parent, ParseJSONRecursive(children, parent)));
-            }
-
-            return files;
-        }
-
-        private string GetFullPath()
-        {
-            string fullPath = RootPath;
-
-            string[] paths = Directories.ToArray();
-
-            for (int i = paths.Length - 1; i >= 0; i--)
-                fullPath = Path.Combine(fullPath, paths[i]);
-
-            return fullPath;
+            CurrentFiles = Client.GetFiles(1);
+            Directories.Push(1);
         }
 
         public void NavigateFolder(BackupFile folder)
         {
-            Directories.Push(folder.Name);
-            CurrentFiles = folder.Children;
-            FullPath = GetFullPath();
+            FullPath = folder.Path;
+            Directories.Push(folder.ID);
+            CurrentFiles = Client.GetFiles(folder.ID);
+            Has7ZParent = CurrentFiles[0].Parent7Z != -1;
         }
 
         public void GoHome()
         {
             Directories.Clear();
-            CurrentFiles = Root;
-            FullPath = GetFullPath();
+            CurrentFiles = Client.GetFiles(1);
+            FullPath = RootPath;
+            Has7ZParent = CurrentFiles[0].Parent7Z != -1;
         }
 
         public void GoBack()
         {
-            if (Directories.Count > 0)
-                Directories.Pop();
+            if (Directories.Count <= 1)
+            {
+                GoHome();
+                return;
+            }
 
-            if (CurrentFiles[0].Parent != null && CurrentFiles[0].Parent?.Parent != null)
-                CurrentFiles = CurrentFiles[0].Parent?.Parent?.Children;
+            Directories.Pop();
+
+            CurrentFiles = Client.GetFiles(Directories.Peek());
+            Has7ZParent = CurrentFiles[0].Parent7Z != -1;
+
+            int parent2 = Directories.Pop();
+
+            if (Directories.Count == 0)
+                FullPath = RootPath;
             else
-                CurrentFiles = Root;
+                FullPath = Client.GetFiles(Directories.Peek())[0].Path;
 
-            FullPath = GetFullPath();
+            Directories.Push(parent2);
         }
     }
 }

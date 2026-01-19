@@ -10,8 +10,12 @@
 	}
 	<div>
 		<div class="navigation-bar">
-			<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
-			<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
+			<img src="backbtn.svg" class="btn" alt="Back" title="Go Back 1 Directory" @onclick="GoBack" />
+			<img src="home.svg" class="btn" alt="Home" title="Go Home" @onclick="GoHome" />
+			@if (CanDownload7Z)
+			{
+				<img src="download.svg" class="btn" alt="Home" title="Download Full 7-Zip File" @onclick="Download7Z" />
+			}
 			@FullPath
 		</div>
 		<div class="file-view">
@@ -32,6 +36,8 @@
 	private BackupFile[] Files = new BackupFile[0];
 
 	private bool Visible = false;
+
+	private bool CanDownload7Z = false;
 
 	protected override void OnInitialized()
 	{
@@ -66,21 +72,45 @@
 	{
 		Files = NavService.CurrentFiles.ToArray();
 		FullPath = NavService.FullPath;
+		CanDownload7Z = NavService.Has7ZParent;
 	}
 
 	private void HandleFolderNavigation(BackupFile file)
 	{
 		if (file.IsFile)
 		{
-			string safePath = Uri.EscapeDataString(NavService.FullPath);
 			string safeName = Uri.EscapeDataString(file.Name);
 			string returnUrl = Uri.EscapeDataString(Nav.BaseUri);
 
-			Nav.NavigateTo($"/api/download?fullPath={safePath}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
+			Nav.NavigateTo($"/api/download?id={file.ID}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
 			return;
 		}
 
 		NavService.NavigateFolder(file);
 		Update();
+	}
+
+	private void Download7Z()
+	{
+		if (!CanDownload7Z)
+			return;
+
+		BackupFile firstFile = NavService.CurrentFiles[0];
+
+		if (firstFile.Parent7Z == -1)
+		{
+			Console.WriteLine("Invalid Parent ID, Aborting");
+			return;
+		}
+
+		BackupFile? file = new SQLClient().GetFile(firstFile.Parent7Z);
+
+		if (file == null)
+			return;
+
+		string safeName = Uri.EscapeDataString(file.Name + ".7z");
+		string returnUrl = Uri.EscapeDataString(Nav.BaseUri);
+
+		Nav.NavigateTo($"/api/download?id={file.ID}&fileName={safeName}&returnUrl={returnUrl}", forceLoad: true);
 	}
 }

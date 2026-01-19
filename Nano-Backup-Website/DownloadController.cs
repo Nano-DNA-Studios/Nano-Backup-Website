@@ -8,20 +8,16 @@ namespace NanoBackupWebsite
     public class DownloadController : ControllerBase
     {
         [HttpGet]
-        public IActionResult GetFile([FromQuery] string fullPath, [FromQuery] string fileName, [FromQuery] string returnUrl)
+        public IActionResult GetFile([FromQuery] string id, [FromQuery] string fileName, [FromQuery] string returnUrl)
         {
-            // Get the Path to the File on the local machine
-            string baseFolder = AppContext.BaseDirectory;
-            string path = Path.Combine(baseFolder, fullPath, fileName);
+            Console.WriteLine($"Downloading File : {fileName}");
 
-            if (!System.IO.File.Exists(path))
+            Stream? stream = new SQLClient().GetFileStream(int.Parse(id));
+
+            if (stream == null)
                 return Redirect($"{returnUrl}?error=NotFound");
 
-            Console.WriteLine($"Downloading File : {fileName} from {path}");
-
-            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            return File(fs, "application/octet-stream", fileName, true);
+            return File(stream, "application/octet-stream", fileName, true);
         }
     }
 }

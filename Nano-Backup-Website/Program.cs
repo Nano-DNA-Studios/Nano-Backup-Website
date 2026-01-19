@@ -67,7 +67,6 @@ namespace NanoBackupWebsite
 
             foreach (string line in File.ReadLines(envPath))
             {
-                //Skip Empty Lines and Comments 
                 if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
                     continue;
 
