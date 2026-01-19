@@ -24,6 +24,9 @@ namespace NanoBackupWebsite
                     if ((bool)reader["is_7z"])
                         return new FileStream((string)reader["path"] + ".7z", FileMode.Open, FileAccess.Read, FileShare.Read);
 
+                    if (reader["parent_7z"] == DBNull.Value)
+                        return new FileStream((string)reader["path"], FileMode.Open, FileAccess.Read, FileShare.Read);
+
                     int parent7zId = (int)reader["parent_7z"];
                     string targetFileName = (string)reader["name"];
 
