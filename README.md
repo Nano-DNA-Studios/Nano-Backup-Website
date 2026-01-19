@@ -30,6 +30,8 @@ v0.1.8 - Nov 11 2025 - Added Software Folder with a few Windows Softwares that a
 
 v0.2.0 - Dec 28 2025 - Improved Website by remaking it in Blazor/DotNet/C# Increasing Reliability and Download Speed
 
+v0.2.1 - Dec 30 2025 - Substantially Reduced the size of the Docker Container hosting the website
+
 v1.0.0 - Jan 18 2026 - Upgraded Backend to use Postgres SQL, Added Better File Visibility and Download Capabilities
 
 # Contact
