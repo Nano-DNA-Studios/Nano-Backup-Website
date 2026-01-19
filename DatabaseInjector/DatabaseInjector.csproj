@@ -14,9 +14,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update=".env">
+		<None Include="..\.env" Link=".env">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
+	
 </Project>

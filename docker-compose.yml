@@ -3,28 +3,26 @@ services:
     image: postgres:17
     container_name: postgres_db
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${Username}
       POSTGRES_PASSWORD: ${POSTGRESPASSWORD}
       POSTGRES_DB: ${POSTGRESDB}
-    ports:
-      - "5433:5432"
     volumes:
-      - "C:/Users/MrDNA/Downloads/nanobackupwebsite.sql:/docker-entrypoint-initdb.d/init.sql"
+      - ${POSTGRESDBFILE}:/docker-entrypoint-initdb.d/init.sql
 
   app:
-    build: .
+    image: nano-backup-website
     container_name: nano-backup-website
     depends_on:
       - db
     environment:
-      - ConnectionString=Host=db;Port=5432;Username=postgres;Password=${POSTGRESPASSWORD};Database=${POSTGRESDB}
+      - ConnectionString=${ConnectionString}
       - CertPath=${CertPath}
       - CertPassword=${CertPassword}
     volumes:
-      - ./Nano-Backup-Website/Certification:/Nano-Backup/Certification
-      - "E:/Backups/Important Backup/School/Class Backup SQL Test:/Class Backups"
+      - ${CertPath}:/Nano-Backup/Certification
+      - ${FileDir}:/Class Backups
     ports:
-      - "8080:443"
+      - ${OutputPort}:443
 
 volumes:
   pgdata:
