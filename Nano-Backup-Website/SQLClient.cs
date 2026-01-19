@@ -37,36 +37,24 @@ namespace NanoBackupWebsite
                     if (archiveStream == null)
                         return null;
 
-                    try
+                    using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
                     {
-                        using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
+                        SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
                         {
-                            SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
-                            {
-                                if (e.Key == null)
-                                    return false;
+                            if (e.Key == null)
+                                return false;
 
-                                return !e.IsDirectory && e.Key.Contains(targetFileName);
-                            });
+                            return !e.IsDirectory && e.Key.Contains(targetFileName);
+                        });
 
-                            if (entry == null)
-                                throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
+                        if (entry == null)
+                            throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
 
-                            Console.WriteLine($"Extracting File : {entry.Key}");
+                        Console.WriteLine($"Extracting File : {entry.Key}");
 
-                            MemoryStream memoryStream = new MemoryStream((int)entry.Size);
-                            using (Stream entryStream = entry.OpenEntryStream())
-                                entryStream.CopyTo(memoryStream);
+                        archiveStream = entry.OpenEntryStream();
 
-                            memoryStream.Position = 0;
-
-                            Console.WriteLine("File Extracted Successfully");
-                            return memoryStream;
-                        }
-                    } finally
-                    {
-                        archiveStream.Dispose();
-                        GC.Collect(2, GCCollectionMode.Forced, false);
+                        return archiveStream;
                     }
                 }
             }
@@ -150,7 +138,7 @@ namespace NanoBackupWebsite
                             id = (int)reader["id"];
 
                         if (reader["parent_id"] == DBNull.Value)
-                           pID = 0;
+                            pID = 0;
                         else
                             pID = (int)reader["parent_id"];
 
@@ -166,7 +154,7 @@ namespace NanoBackupWebsite
             return null;
         }
 
-        public int GetNumberOfFilesOrFolders (bool file)
+        public int GetNumberOfFilesOrFolders(bool file)
         {
             string SQLQuery = "SELECT COUNT(*) FROM nanobackupdatabase WHERE is_file = @file";
 
@@ -182,7 +170,7 @@ namespace NanoBackupWebsite
 
                     object? result = command.ExecuteScalar();
 
-                    if (result != null) 
+                    if (result != null)
                         return result != null ? Convert.ToInt32(result) : 0;
                 }
                 catch (Exception ex)
