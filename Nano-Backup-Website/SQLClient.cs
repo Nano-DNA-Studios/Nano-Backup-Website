@@ -37,31 +37,36 @@ namespace NanoBackupWebsite
                     if (archiveStream == null)
                         return null;
 
-                    using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
+                    try
                     {
-                        SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
+                        using (SevenZipArchive archive = SevenZipArchive.Open(archiveStream))
                         {
-                            if (e.Key == null)
-                                return false;
+                            SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
+                            {
+                                if (e.Key == null)
+                                    return false;
 
-                            return !e.IsDirectory && e.Key.Contains(targetFileName);
-                        });
+                                return !e.IsDirectory && e.Key.Contains(targetFileName);
+                            });
 
-                        if (entry == null)
-                            throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
+                            if (entry == null)
+                                throw new FileNotFoundException($"Could not find {targetFileName} inside the archive.");
 
-                        Console.WriteLine($"Extracting File : {entry.Key}");
+                            Console.WriteLine($"Extracting File : {entry.Key}");
 
-                        MemoryStream memoryStream = new MemoryStream((int)entry.Size);
-                        using (Stream entryStream = entry.OpenEntryStream())
-                            entryStream.CopyTo(memoryStream);
+                            MemoryStream memoryStream = new MemoryStream((int)entry.Size);
+                            using (Stream entryStream = entry.OpenEntryStream())
+                                entryStream.CopyTo(memoryStream);
 
-                        memoryStream.Position = 0;
+                            memoryStream.Position = 0;
 
+                            Console.WriteLine("File Extracted Successfully");
+                            return memoryStream;
+                        }
+                    } finally
+                    {
                         archiveStream.Dispose();
-
-                        Console.WriteLine("File Extracted Successfully");
-                        return memoryStream;
+                        GC.Collect(2, GCCollectionMode.Forced, false);
                     }
                 }
             }
