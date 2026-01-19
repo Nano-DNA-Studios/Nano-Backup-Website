@@ -10,11 +10,11 @@
 	}
 	<div>
 		<div class="navigation-bar">
-			<img src="backbtn.svg" class="btn" alt="Back" @onclick="GoBack" />
-			<img src="home.svg" class="btn" alt="Home" @onclick="GoHome" />
+			<img src="backbtn.svg" class="btn" alt="Back" title="Go Back 1 Directory" @onclick="GoBack" />
+			<img src="home.svg" class="btn" alt="Home" title="Go Home" @onclick="GoHome" />
 			@if (CanDownload7Z)
 			{
-				<img src="download.svg" class="btn" alt="Home" @onclick="Download7Z" />
+				<img src="download.svg" class="btn" alt="Home" title="Download Full 7-Zip File" @onclick="Download7Z" />
 			}
 			@FullPath
 		</div>
