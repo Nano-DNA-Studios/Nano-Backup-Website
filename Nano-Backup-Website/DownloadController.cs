@@ -28,7 +28,7 @@ namespace NanoBackupWebsite
 
             Stream?.Dispose();
 
-            GC.Collect(3, GCCollectionMode.Forced, true);
+            GC.Collect(2, GCCollectionMode.Aggressive, true);
         }
     }
 }
