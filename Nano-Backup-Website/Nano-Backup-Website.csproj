@@ -7,7 +7,7 @@
     <RootNamespace>NanoBackupWebsite</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
     <Platforms>AnyCPU;x64;x86</Platforms>
-		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<ServerGarbageCollection>false</ServerGarbageCollection>
 		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
