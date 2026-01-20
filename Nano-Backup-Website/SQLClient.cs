@@ -1,15 +1,29 @@
 ﻿using Npgsql;
 using SharpCompress.Archives.SevenZip;
+using System.Diagnostics;
 
 namespace NanoBackupWebsite
 {
-    public class SQLClient
+    public class SQLClient : IDisposable
     {
         private static string ConnectionString = Environment.GetEnvironmentVariable("ConnectionString") ?? "";
 
+        public SevenZipArchive? Archive;
+
+        public void Dispose()
+        {
+            if (Archive != null)
+                Archive.Dispose();
+            
+            GC.Collect(2, GCCollectionMode.Aggressive, true);
+        }
+
         ~SQLClient()
         {
-            GC.Collect(2, GCCollectionMode.Aggressive, true);
+            if (Archive != null)
+                Archive.Dispose();
+
+            GC.Collect(2, GCCollectionMode.Optimized, true);
         }
 
         public Stream? GetFileStream(int id)
@@ -30,8 +44,8 @@ namespace NanoBackupWebsite
             if (parentFile == null)
                 return null;
 
-            SevenZipArchive archive = SevenZipArchive.Open(parentFile.Path + ".7z");
-            SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
+            Archive = SevenZipArchive.Open(parentFile.Path + ".7z");
+            SevenZipArchiveEntry? entry = Archive.Entries.FirstOrDefault(e =>
             {
                 if (e.Key == null)
                     return false;
@@ -81,6 +95,7 @@ namespace NanoBackupWebsite
                     Files.Add(file);
                 }
 
+                reader.Close();
                 reader.DisposeAsync();
             }
             catch (Exception ex)
@@ -135,6 +150,7 @@ namespace NanoBackupWebsite
                 if (!reader.IsDBNull(reader.GetOrdinal("parent_7z")))
                     fileID7Z = (int)reader["parent_7z"];
 
+                reader.Close();
                 reader.DisposeAsync();
                 command.Dispose();
                 connection.Close();

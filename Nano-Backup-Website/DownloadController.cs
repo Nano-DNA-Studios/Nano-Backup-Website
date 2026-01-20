@@ -9,12 +9,16 @@ namespace NanoBackupWebsite
     {
         Stream? Stream;
 
+        SQLClient? SQLClient;
+
         [HttpGet]
         public IActionResult GetFile([FromQuery] string id, [FromQuery] string fileName, [FromQuery] string returnUrl)
         {
             Console.WriteLine($"Downloading File : {fileName}");
 
-            Stream = new SQLClient().GetFileStream(int.Parse(id));
+            SQLClient = new SQLClient();
+
+            Stream = SQLClient.GetFileStream(int.Parse(id));
 
             if (Stream == null)
                 return Redirect($"{returnUrl}?error=NotFound");
@@ -24,7 +28,11 @@ namespace NanoBackupWebsite
 
         public void Dispose()
         {
-            Stream?.Dispose();
+            if (Stream != null)
+                Stream.Dispose();
+            
+            if (SQLClient != null) 
+                SQLClient.Dispose();
 
             GC.Collect(2, GCCollectionMode.Aggressive, true);
         }
