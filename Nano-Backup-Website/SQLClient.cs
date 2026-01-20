@@ -14,7 +14,7 @@ namespace NanoBackupWebsite
 
         public Stream? GetFileStream(int id)
         {
-            BackupFile? file = this.GetFile(id);
+            BackupFile? file = GetFile(id);
 
             if (file == null)
                 return null;
@@ -25,14 +25,12 @@ namespace NanoBackupWebsite
             if (file.Parent7Z == -1)
                 return new FileStream(file.Path, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            Console.WriteLine($"Got Parent7Z ID : {file.Parent7Z}");
+            BackupFile? parentFile = GetFile(file.Parent7Z);
 
-            Stream? archiveStream = GetFileStream(file.Parent7Z);
-
-            if (archiveStream == null)
+            if (parentFile == null)
                 return null;
 
-            SevenZipArchive archive = SevenZipArchive.Open(archiveStream);
+            SevenZipArchive archive = SevenZipArchive.Open(parentFile.Path + ".7z");
             SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
             {
                 if (e.Key == null)
@@ -44,13 +42,7 @@ namespace NanoBackupWebsite
             if (entry == null)
                 throw new FileNotFoundException($"Could not find {file.Name} inside the archive.");
 
-            Console.WriteLine($"Extracting File : {entry.Key}");
-
-            archiveStream = entry.OpenEntryStream();
-
-            archive.Dispose();
-
-            return archiveStream;
+            return entry.OpenEntryStream();
         }
 
         public BackupFile[] GetFiles(int parentID)
