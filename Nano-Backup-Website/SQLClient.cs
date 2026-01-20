@@ -1,6 +1,5 @@
 ﻿using Npgsql;
 using SharpCompress.Archives.SevenZip;
-using System.Diagnostics;
 
 namespace NanoBackupWebsite
 {
