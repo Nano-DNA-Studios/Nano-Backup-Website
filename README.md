@@ -13,7 +13,7 @@ This Website is currently being hosted on a dedicated Mini PC in Waterloo.
 
 # Release Versions
 ## Current Website Version
-v1.0.3 - Jan 19 2026
+v1.0.4 - Jan 20 2026
 
 ## Versions
 v0.1.3 - May 22 2025 - Added Organized Version of NE 336. Missing Files were added and Course Organized. Removed some overprotective rules 
@@ -39,6 +39,15 @@ v1.0.1 - Jan 18 2026 - Added Garbage Collection ability to reduce Server Memory 
 v1.0.2 - Jan 18 2026 - Found a way to bypass MemoryStream
 
 v1.0.3 - Jan 19 2026 - Further Garbage Collection Improvements and Server Memory Usage Reduction
+
+v1.0.4 - Jan 20 2026 - Decompressed and Recompressed Database into new Optimized format. Ensured instant Downloads on all Files Occur.
+
+# Research
+After introducing the .7z and SQL Update to the Website I noticed that for retrieving files in larger compressed files it took exponentially longer, so I investigated witt the compression technology on a subsection of files to optimize for both size and Decompression / Serving Efficiency.
+
+I found that that the Sweetspot for sizes and Serving Speed lied at 32 MB or 64 MB as shown in the graph below. This optimization has turned waiting for a 1 minute for certain files to start downloading, to instant downloads on any file!
+
+![Size Comparison](Documentation/Comparison.png)
 
 # Contact
 For Additional Support, Contact MrDNAlex through the following email : ``Mr.DNAlex.2003@gmail.com``.

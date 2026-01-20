@@ -1,0 +1,84 @@
+{
+    "individual_files": {
+        "NE 121 - Fall 2021.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 1.694122314453125,
+            "Class Backup SQL Test - Optimized - 2MB": 1.6777153015136719,
+            "Class Backup SQL Test - Optimized - 4MB": 1.6503591537475586,
+            "Class Backup SQL Test - Optimized - 8MB": 1.6503591537475586,
+            "Class Backup SQL Test - Optimized - 16MB": 1.6503591537475586,
+            "Class Backup SQL Test - Optimized - 32MB": 1.6503591537475586,
+            "Class Backup SQL Test - Optimized - 64MB": 1.6503591537475586,
+            "Class Backup SQL Test": 1.6813039779663086
+        },
+        "MATH 119 - Winter 2022.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 3124.8916788101196,
+            "Class Backup SQL Test - Optimized - 2MB": 3124.794686317444,
+            "Class Backup SQL Test - Optimized - 4MB": 3124.607523918152,
+            "Class Backup SQL Test - Optimized - 8MB": 3122.379895210266,
+            "Class Backup SQL Test - Optimized - 16MB": 3122.3680143356323,
+            "Class Backup SQL Test - Optimized - 32MB": 3122.3684968948364,
+            "Class Backup SQL Test - Optimized - 64MB": 3122.0306844711304,
+            "Class Backup SQL Test": 3133.366352081299
+        },
+        "NE 102 - Winter 2022.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 173.9453477859497,
+            "Class Backup SQL Test - Optimized - 2MB": 173.9391393661499,
+            "Class Backup SQL Test - Optimized - 4MB": 173.9391393661499,
+            "Class Backup SQL Test - Optimized - 8MB": 173.93532466888428,
+            "Class Backup SQL Test - Optimized - 16MB": 173.92744827270508,
+            "Class Backup SQL Test - Optimized - 32MB": 173.93603897094727,
+            "Class Backup SQL Test - Optimized - 64MB": 173.93921661376953,
+            "Class Backup SQL Test": 174.29540538787842
+        },
+        "NE 113 - Winter 2022.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 29.501100540161133,
+            "Class Backup SQL Test - Optimized - 2MB": 27.64437961578369,
+            "Class Backup SQL Test - Optimized - 4MB": 27.47068500518799,
+            "Class Backup SQL Test - Optimized - 8MB": 26.953760147094727,
+            "Class Backup SQL Test - Optimized - 16MB": 26.442686080932617,
+            "Class Backup SQL Test - Optimized - 32MB": 26.442575454711914,
+            "Class Backup SQL Test - Optimized - 64MB": 26.200103759765625,
+            "Class Backup SQL Test": 26.292146682739258
+        },
+        "NE 125 - Winter 2022.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 332.2323808670044,
+            "Class Backup SQL Test - Optimized - 2MB": 332.0421714782715,
+            "Class Backup SQL Test - Optimized - 4MB": 328.7470483779907,
+            "Class Backup SQL Test - Optimized - 8MB": 324.9897222518921,
+            "Class Backup SQL Test - Optimized - 16MB": 319.97526264190674,
+            "Class Backup SQL Test - Optimized - 32MB": 318.97949028015137,
+            "Class Backup SQL Test - Optimized - 64MB": 317.8490238189697,
+            "Class Backup SQL Test": 319.8106117248535
+        },
+        "NE 131 - Winter 2022.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 206.1751480102539,
+            "Class Backup SQL Test - Optimized - 2MB": 206.1751480102539,
+            "Class Backup SQL Test - Optimized - 4MB": 206.1751298904419,
+            "Class Backup SQL Test - Optimized - 8MB": 205.95041942596436,
+            "Class Backup SQL Test - Optimized - 16MB": 205.9472141265869,
+            "Class Backup SQL Test - Optimized - 32MB": 205.73443603515625,
+            "Class Backup SQL Test - Optimized - 64MB": 205.5600824356079,
+            "Class Backup SQL Test": 205.66680240631104
+        },
+        "NE 140 - Winter 2022.7z": {
+            "Class Backup SQL Test - Optimized - 1MB": 4662.879035949707,
+            "Class Backup SQL Test - Optimized - 2MB": 4660.493585586548,
+            "Class Backup SQL Test - Optimized - 4MB": 4659.572150230408,
+            "Class Backup SQL Test - Optimized - 8MB": 4658.555565834045,
+            "Class Backup SQL Test - Optimized - 16MB": 4657.804263114929,
+            "Class Backup SQL Test - Optimized - 32MB": 4657.76543712616,
+            "Class Backup SQL Test - Optimized - 64MB": 4657.6587772369385,
+            "Class Backup SQL Test": 4679.035255432129
+        }
+    },
+    "total_sizes": {
+        "Class Backup SQL Test - Optimized - 1MB": 8531.318814277649,
+        "Class Backup SQL Test - Optimized - 2MB": 8526.766825675964,
+        "Class Backup SQL Test - Optimized - 4MB": 8522.162035942078,
+        "Class Backup SQL Test - Optimized - 8MB": 8514.415046691895,
+        "Class Backup SQL Test - Optimized - 16MB": 8508.11524772644,
+        "Class Backup SQL Test - Optimized - 32MB": 8506.87683391571,
+        "Class Backup SQL Test - Optimized - 64MB": 8504.88824748993,
+        "Class Backup SQL Test": 8540.147877693176
+    }
+}

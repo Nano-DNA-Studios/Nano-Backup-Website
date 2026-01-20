@@ -3,18 +3,31 @@ using SharpCompress.Archives.SevenZip;
 
 namespace NanoBackupWebsite
 {
-    public class SQLClient
+    public class SQLClient : IDisposable
     {
         private static string ConnectionString = Environment.GetEnvironmentVariable("ConnectionString") ?? "";
 
+        public SevenZipArchive? Archive;
+
+        public void Dispose()
+        {
+            if (Archive != null)
+                Archive.Dispose();
+            
+            GC.Collect(2, GCCollectionMode.Aggressive, true);
+        }
+
         ~SQLClient()
         {
-            GC.Collect(2, GCCollectionMode.Aggressive, true);
+            if (Archive != null)
+                Archive.Dispose();
+
+            GC.Collect(2, GCCollectionMode.Optimized, true);
         }
 
         public Stream? GetFileStream(int id)
         {
-            BackupFile? file = this.GetFile(id);
+            BackupFile? file = GetFile(id);
 
             if (file == null)
                 return null;
@@ -25,15 +38,13 @@ namespace NanoBackupWebsite
             if (file.Parent7Z == -1)
                 return new FileStream(file.Path, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            Console.WriteLine($"Got Parent7Z ID : {file.Parent7Z}");
+            BackupFile? parentFile = GetFile(file.Parent7Z);
 
-            Stream? archiveStream = GetFileStream(file.Parent7Z);
-
-            if (archiveStream == null)
+            if (parentFile == null)
                 return null;
 
-            SevenZipArchive archive = SevenZipArchive.Open(archiveStream);
-            SevenZipArchiveEntry? entry = archive.Entries.FirstOrDefault(e =>
+            Archive = SevenZipArchive.Open(parentFile.Path + ".7z");
+            SevenZipArchiveEntry? entry = Archive.Entries.FirstOrDefault(e =>
             {
                 if (e.Key == null)
                     return false;
@@ -44,13 +55,7 @@ namespace NanoBackupWebsite
             if (entry == null)
                 throw new FileNotFoundException($"Could not find {file.Name} inside the archive.");
 
-            Console.WriteLine($"Extracting File : {entry.Key}");
-
-            archiveStream = entry.OpenEntryStream();
-
-            archive.Dispose();
-
-            return archiveStream;
+            return entry.OpenEntryStream();
         }
 
         public BackupFile[] GetFiles(int parentID)
@@ -89,6 +94,7 @@ namespace NanoBackupWebsite
                     Files.Add(file);
                 }
 
+                reader.Close();
                 reader.DisposeAsync();
             }
             catch (Exception ex)
@@ -143,6 +149,7 @@ namespace NanoBackupWebsite
                 if (!reader.IsDBNull(reader.GetOrdinal("parent_7z")))
                     fileID7Z = (int)reader["parent_7z"];
 
+                reader.Close();
                 reader.DisposeAsync();
                 command.Dispose();
                 connection.Close();
