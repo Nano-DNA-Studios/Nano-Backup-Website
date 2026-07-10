@@ -42,6 +42,8 @@ v1.0.3 - Jan 19 2026 - Further Garbage Collection Improvements and Server Memory
 
 v1.0.4 - Jan 20 2026 - Decompressed and Recompressed Database into new Optimized format. Ensured instant Downloads on all Files Occur.
 
+v1.0.5
+
 # Research
 After introducing the .7z and SQL Update to the Website I noticed that for retrieving files in larger compressed files it took exponentially longer, so I investigated witt the compression technology on a subsection of files to optimize for both size and Decompression / Serving Efficiency.
 
