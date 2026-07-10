@@ -13,7 +13,7 @@ This Website is currently being hosted on a dedicated Mini PC in Waterloo.
 
 # Release Versions
 ## Current Website Version
-v1.0.4 - Jan 20 2026
+v1.0.5 - Jul 09 2026
 
 ## Versions
 v0.1.3 - May 22 2025 - Added Organized Version of NE 336. Missing Files were added and Course Organized. Removed some overprotective rules 
@@ -42,7 +42,7 @@ v1.0.3 - Jan 19 2026 - Further Garbage Collection Improvements and Server Memory
 
 v1.0.4 - Jan 20 2026 - Decompressed and Recompressed Database into new Optimized format. Ensured instant Downloads on all Files Occur.
 
-v1.0.5
+v1.0.5 - Jul 09 2026 - Adding 4A and 4B Classes to the Nano Backup Website, and ensuring they are displayed properly by ordering items alphabetically.
 
 # Research
 After introducing the .7z and SQL Update to the Website I noticed that for retrieving files in larger compressed files it took exponentially longer, so I investigated witt the compression technology on a subsection of files to optimize for both size and Decompression / Serving Efficiency.
