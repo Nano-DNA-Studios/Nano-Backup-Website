@@ -13,7 +13,7 @@ namespace NanoBackupWebsite
         {
             if (Archive != null)
                 Archive.Dispose();
-            
+
             GC.Collect(2, GCCollectionMode.Aggressive, true);
         }
 
@@ -60,7 +60,12 @@ namespace NanoBackupWebsite
 
         public BackupFile[] GetFiles(int parentID)
         {
-            string SQLQuery = "SELECT * FROM nanobackupdatabase WHERE parent_id = @id";
+            string SQLQuery = @"
+                SELECT *
+                FROM nanobackupdatabase
+                WHERE parent_id = @id
+                ORDER BY lower(name), name;
+            ";
 
             List<BackupFile> Files = new List<BackupFile>();
 

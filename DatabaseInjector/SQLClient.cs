@@ -82,7 +82,7 @@ namespace DatabaseInjector
 
             if (!isFile && info == null)
             {
-                string[] children = Directory.GetFileSystemEntries(path);
+                string[] children = Directory.GetFileSystemEntries(path).OrderBy(p => Path.GetFileName(p), StringComparer.OrdinalIgnoreCase).ToArray();
 
                 foreach (string childPath in children)
                     ProcessBackup(childPath, currentID, id7z, null);
